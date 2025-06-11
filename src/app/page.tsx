@@ -1,9 +1,10 @@
-
-
 export default function Home() {
   return (
-    <div className="bg-secondary">
-    <h1>BIENVENIDO A VITTA</h1>
-    </div>
+    <main className="min-h-screen bg-white text-black p-8">
+      <div>
+        <h1>HOME</h1>
+      </div>
+    </main>
   );
 }
+
