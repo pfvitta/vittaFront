@@ -1,9 +1,8 @@
-const RegisterUser = () => {
+import RegisterUser from "@/components/RegisterUser/RegisterUser";
+const RegisterUserPage = () => {
     return (
-        <div>
-<h1>Registro de usuarios</h1>
-        </div>
+        <RegisterUser />
     )
 }
 
-export default RegisterUser;
+export default RegisterUserPage;
