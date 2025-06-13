@@ -3,9 +3,7 @@ import { RegisterProviderValues, RegisterProviderErrors } from "../types/Registe
 export const validateProviderRegister = (
   values: RegisterProviderValues
 ): { errors: RegisterProviderErrors; isValid: boolean } => {
-  const errors: RegisterProviderErrors = {
-      id: ""
-  };
+  const errors: RegisterProviderErrors = {};
 
   if (!values.firstName.trim()) {
     errors.firstName = 'El nombre es requerido';

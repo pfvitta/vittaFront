@@ -37,7 +37,7 @@ export default function Login() {
         <div className="flex justify-center mb-8">
           <Image src="/logo-png-vitta.png" alt="Logo Vitta" width={80} height={80} />
         </div>
-        <h2 className="text-2xl font-semibold text-center mb-6">Log in</h2>
+        <h2 className="text-2xl font-semibold text-center mb-6">Iniciar sesión</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -65,15 +65,15 @@ export default function Login() {
           </div>
 
           <button type="submit" className="w-full bg-teal-700 text-white py-2 rounded-md hover:bg-teal-800">
-            Log In
+            Iniciar sesión
           </button>
         </form>
 
         <div className="mt-4 text-center">
-          <a href="#" className="text-teal-700 hover:underline">Reset password</a>
+          <a href="#" className="text-teal-700 hover:underline">Reestablecer contraseña</a>
         </div>
         <p className="mt-6 text-center text-sm text-gray-500">
-          If you need help, contact <a href="mailto:support@vitta.org" className="text-teal-700 underline">support@vitta.org</a>
+          Si necesitas ayuda, contáctanos a <a href="mailto:support@vitta.org" className="text-teal-700 underline">support@vitta.org</a>
         </p>
         <p className="mt-2 text-center text-xs text-gray-400">Copyright © Vitta Inc. 2025</p>
       </div>

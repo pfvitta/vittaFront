@@ -7,7 +7,6 @@ import { RegisterProviderValues, RegisterProviderErrors } from '../../types/Regi
 
 function RegisterProvider() {
   const [formValues, setFormValues] = useState<RegisterProviderValues>({
-    id: '',
     firstName: '',
     lastName: '',
     tipoDocumento: '',
@@ -19,7 +18,6 @@ function RegisterProvider() {
   });
 
   const [formErrors, setFormErrors] = useState<RegisterProviderErrors>({
-    id: '',
     firstName: '',
     lastName: '',
     tipoDocumento: '',
@@ -46,7 +44,7 @@ function RegisterProvider() {
     e.preventDefault();
 
     try {
-      const res = await fetch('localhost:3001/providers/register', {
+      const res = await fetch('http://localhost:3001/providers/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formValues),

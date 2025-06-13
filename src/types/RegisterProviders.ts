@@ -1,5 +1,4 @@
 export interface RegisterProviderValues {
-    id: string;
     firstName: string;
     lastName: string;
     tipoDocumento: string;
@@ -11,7 +10,6 @@ export interface RegisterProviderValues {
   }
   
   export interface RegisterProviderErrors {
-    id: string;
     firstName?: string;
     lastName?: string;
     tipoDocumento?: string;
