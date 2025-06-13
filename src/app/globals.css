@@ -14,3 +14,7 @@ body {
   color: var(--color-secondary);
   font-family: system-ui, sans-serif;
 }
+
+.input-form {
+  @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition
+}

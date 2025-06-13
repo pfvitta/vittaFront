@@ -1,9 +1,7 @@
-const RegisterProvider = () => {
-    return (
-        <div>
-<h1>Registro de proveedores de servicio profesional</h1>
-        </div>
-    )
-}
-
-export default RegisterProvider;
+import RegisterProvider from "@/components/RegisterProvider/RegisterProvider";
+const RegisterProviderPage = () => {
+      return (
+       <RegisterProvider />
+      );
+    }
+export default RegisterProviderPage;

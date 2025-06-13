@@ -1,9 +1,10 @@
-const Providers = () => {
+import Providers from "@/components/Providers/Providers";
+const ProvidersPage = () => {
     return (
         <div>
-<h1>Profesionales</h1>
+            <Providers />
         </div>
     )
 }
 
-export default Providers;
+export default ProvidersPage;
