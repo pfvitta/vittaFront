@@ -35,7 +35,7 @@ const Hero = () => {
         className="hidden lg:block"
       >
         <Image
-          src="/FotoHero1.jpg"
+          src="/FotoHero3.jpg"
           alt="Consulta virtual"
           width={600}
           height={600}
