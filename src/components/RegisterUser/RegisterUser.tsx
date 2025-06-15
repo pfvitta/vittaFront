@@ -1,49 +1,61 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { validateRegister } from '../../helpers/registerUserValidations';
-import { RegisterFormValues, RegisterFormErrors } from '../../types/RegisterUser';
+import { useForm } from "react-hook-form";
+import Image from "next/image";
+import { registerUser } from "@/services/userService";
 
-function RegisterUser() {
-  const [formValues, setFormValues] = useState<RegisterFormValues>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
+type RegisterUserForm = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  phone: string;
+  dni: string;
+  city: string;
+  dob: string;
+};
+
+export default function RegisterUserForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    reset,
+  } = useForm<RegisterUserForm>({
+    mode: "onChange",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      phone: "",
+      dni: "",
+      city: "",
+      dob: "",
+    },
   });
 
-  const [formErrors, setFormErrors] = useState<RegisterFormErrors>({});
-  const [isValid, setIsValid] = useState(false);
-
-  useEffect(() => {
-    const { errors, isValid } = validateRegister(formValues);
-    setFormErrors(errors);
-    setIsValid(isValid);
-  }, [formValues]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormValues(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isValid) return;
+  const onSubmit = async (data: RegisterUserForm) => {
+    const payload = {
+      name: `${data.firstName} ${data.lastName}`,
+      email: data.email,
+      password: data.password,
+      phone: data.phone,
+      dni: data.dni,
+      city: data.city,
+      dob: data.dob,
+      role: "user",
+    };
 
     try {
-      const res = await fetch('localhost:3001/users/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formValues),
-      });
-
-      if (!res.ok) throw new Error('Error al registrar');
-      await res.json();
-      alert('Registro exitoso');
-    } catch (err) {
-      console.error(err);
-      alert('Ocurrió un error');
+      await registerUser(payload);
+      alert("Registro exitoso");
+      reset();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err);
+        alert("Error: " + err.message);
+      } 
     }
   };
 
@@ -52,73 +64,145 @@ function RegisterUser() {
       <div className="flex flex-col md:flex-row w-full max-w-5xl shadow-xl rounded-lg overflow-hidden">
         <div className="bg-white p-8 md:rounded-l-lg rounded-t-lg md:rounded-tr-none shadow-sm w-full md:w-auto">
           <h2 className="text-2xl font-semibold text-center text-secondary mb-4">Crear una cuenta</h2>
-          <p className="text-center text-secondary text-sm mb-8">Completa el formulario para registrarte como usuario</p>
+          <p className="text-center text-secondary text-sm mb-8">
+            Completa el formulario para registrarte como usuario
+          </p>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {/* Nombre */}
             <div>
-              <label className="block text-sm font-medium text-secondary mb-2">Nombre</label>
+              <label className="block text-sm font-medium mb-2">Nombre</label>
               <input
                 type="text"
-                name="firstName"
+                {...register("firstName", {
+                  required: "El nombre es obligatorio",
+                  pattern: {
+                    value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                    message: "Solo letras",
+                  },
+                })}
                 className="input-form"
-                placeholder="Tu nombre"
-                value={formValues.firstName}
-                onChange={handleChange}
               />
-              {formErrors.firstName && <p className="text-red-500 text-sm mt-1">{formErrors.firstName}</p>}
+              {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>}
             </div>
 
             {/* Apellido */}
             <div>
-              <label className="block text-sm font-medium text-secondary mb-2">Apellido</label>
+              <label className="block text-sm font-medium mb-2">Apellido</label>
               <input
                 type="text"
-                name="lastName"
+                {...register("lastName", {
+                  required: "El apellido es obligatorio",
+                  pattern: {
+                    value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                    message: "Solo letras",
+                  },
+                })}
                 className="input-form"
-                placeholder="Tu apellido"
-                value={formValues.lastName}
-                onChange={handleChange}
               />
-              {formErrors.lastName && <p className="text-red-500 text-sm mt-1">{formErrors.lastName}</p>}
+              {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>}
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-secondary mb-2">Correo electrónico</label>
+              <label className="block text-sm font-medium mb-2">Correo electrónico</label>
               <input
                 type="email"
-                name="email"
+                {...register("email", {
+                  required: "El correo es obligatorio",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Correo inválido",
+                  },
+                })}
                 className="input-form"
-                placeholder="tucorreo@ejemplo.com"
-                value={formValues.email}
-                onChange={handleChange}
               />
-              {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
             </div>
 
             {/* Contraseña */}
             <div>
-              <label className="block text-sm font-medium text-secondary mb-2">Contraseña</label>
+              <label className="block text-sm font-medium mb-2">Contraseña</label>
               <input
                 type="password"
-                name="password"
+                {...register("password", {
+                  required: "La contraseña es obligatoria",
+                  minLength: { value: 6, message: "Mínimo 6 caracteres" },
+                  pattern: {
+                    value: /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/,
+                    message: "Debe tener mayúscula, número y símbolo",
+                  },
+                })}
                 className="input-form"
-                placeholder="••••••••"
-                value={formValues.password}
-                onChange={handleChange}
               />
-              {formErrors.password && <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>}
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
             </div>
 
-            {/* Botón */}
+            {/* Teléfono */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Teléfono</label>
+              <input
+                type="text"
+                {...register("phone", {
+                  required: "El teléfono es obligatorio",
+                  minLength: { value: 7, message: "Debe tener al menos 7 caracteres" },
+                })}
+                className="input-form"
+              />
+              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+            </div>
+
+            {/* DNI */}
+            <div>
+              <label className="block text-sm font-medium mb-2">DNI</label>
+              <input
+                type="text"
+                {...register("dni", {
+                  required: "El documento es obligatorio",
+                  pattern: {
+                    value: /^\d{5,10}$/,
+                    message: "Debe tener entre 5 y 10 dígitos",
+                  },
+                })}
+                className="input-form"
+              />
+              {errors.dni && <p className="text-red-500 text-sm mt-1">{errors.dni.message}</p>}
+            </div>
+
+            {/* Ciudad */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Ciudad</label>
+              <input
+                type="text"
+                {...register("city", {
+                  required: "La ciudad es obligatoria",
+                  minLength: { value: 2, message: "Debe tener al menos 2 letras" },
+                })}
+                className="input-form"
+              />
+              {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>}
+            </div>
+
+            {/* Fecha de nacimiento */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Fecha de nacimiento</label>
+              <input
+                type="date"
+                {...register("dob", {
+                  required: "La fecha es obligatoria",
+                })}
+                className="input-form"
+              />
+              {errors.dob && <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>}
+            </div>
+
             <button
               type="submit"
               disabled={!isValid}
               className={`w-full px-4 py-2 rounded-full text-sm border transition ${
                 isValid
-                  ? 'bg-primary text-white border-primary hover:bg-secondary'
-                  : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                  ? "bg-primary text-white border-primary hover:bg-secondary"
+                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
               }`}
             >
               Registrarse
@@ -127,7 +211,7 @@ function RegisterUser() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-secondary">
-              ¿Ya tienes una cuenta?{' '}
+              ¿Ya tienes una cuenta?{" "}
               <a href="/login" className="text-primary hover:text-secondary font-medium transition">
                 Inicia sesión
               </a>
@@ -149,6 +233,5 @@ function RegisterUser() {
   );
 }
 
-export default RegisterUser;
 
 

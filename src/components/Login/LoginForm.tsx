@@ -1,33 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { validateLogin } from '../../helpers/loginValidations'; // ajusta la ruta si es necesario
+import { useForm } from "react-hook-form";
+import { loginUser } from "@/services/authService";
+import Image from "next/image";
+
+type LoginFormValues = {
+  email: string;
+  password: string;
+};
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  type Errors = {
-    email?: string;
-    password?: string;
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({ mode: "onChange" });
 
-  const [errors, setErrors] = useState<Errors>({});
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const updatedData = { ...formData, [name]: value };
-    setFormData(updatedData);
-    setErrors(validateLogin(updatedData)); // Validación en tiempo real
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const validationErrors = validateLogin(formData);
-    setErrors(validationErrors);
-
-    if (Object.keys(validationErrors).length === 0) {
-      // ✅ Aquí iría la lógica para hacer login (API call, etc.)
-      console.log('Login exitoso:', formData);
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      const response = await loginUser(data);
+      alert("Inicio de sesión exitoso");
+      console.log("Usuario autenticado:", response);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(error.message || "Error al iniciar sesión");
+      } 
     }
   };
 
@@ -39,32 +36,39 @@ export default function Login() {
         </div>
         <h2 className="text-2xl font-semibold text-center mb-6">Iniciar sesión</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <input
               type="email"
-              name="email"
-              placeholder="Email address"
-              value={formData.email}
-              onChange={handleChange}
+              placeholder="Correo electrónico"
+              {...register("email", {
+                required: "El correo es obligatorio",
+                pattern: {
+                  value: /^\S+@\S+\.\S+$/,
+                  message: "Correo no válido",
+                },
+              })}
               className="input-form"
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           </div>
 
           <div>
             <input
               type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
+              placeholder="Contraseña"
+              {...register("password", {
+                required: "La contraseña es obligatoria",
+              })}
               className="input-form"
             />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
           </div>
 
-          <button type="submit" className="w-full bg-teal-700 text-white py-2 rounded-md hover:bg-teal-800">
+          <button
+            type="submit"
+            className="w-full bg-teal-700 text-white py-2 rounded-md hover:bg-teal-800"
+          >
             Iniciar sesión
           </button>
         </form>
@@ -73,7 +77,7 @@ export default function Login() {
           <a href="#" className="text-teal-700 hover:underline">Reestablecer contraseña</a>
         </div>
         <p className="mt-6 text-center text-sm text-gray-500">
-          Si necesitas ayuda, contáctanos a <a href="mailto:support@vitta.org" className="text-teal-700 underline">support@vitta.org</a>
+          ¿Necesitas ayuda? <a href="mailto:support@vitta.org" className="text-teal-700 underline">support@vitta.org</a>
         </p>
         <p className="mt-2 text-center text-xs text-gray-400">Copyright © Vitta Inc. 2025</p>
       </div>
