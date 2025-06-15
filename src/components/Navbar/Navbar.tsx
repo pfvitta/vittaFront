@@ -22,11 +22,11 @@ const Navbar = () => {
         {/* Links */}
         <nav className="space-x-10 text-md font-medium text-secondary">
           <Link href="/providers">Profesionales</Link>
-          <Link href="#">Acerca de nosotros</Link>
-          <Link href="#">Blog</Link>
+          <Link href="/about-us">Acerca de nosotros</Link>
+          <Link href="blog">Blog</Link>
         </nav>
 
-        <Link href="/login" className="text-md text-secondary hover:text-primary transition">
+        <Link href="/login" className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
         Iniciar sesión</Link>
 
         {/* Botón */}
