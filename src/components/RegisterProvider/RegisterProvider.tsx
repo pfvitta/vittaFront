@@ -15,7 +15,7 @@ const defaultValues: RegisterProviderValues = {
     dni: "",
     city: "",
     dob: "",
-    role: "profesional",
+    role: "provider",
   },
   professionalProfile: {
     biography: "",

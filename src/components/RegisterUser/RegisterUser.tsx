@@ -3,10 +3,10 @@
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { registerUser } from "@/services/userService";
+import { RegisterUserValues } from "@/types/RegisterUser";
 
-type RegisterUserForm = {
-  firstName: string;
-  lastName: string;
+type FormInputs = {
+  fullName: string;
   email: string;
   password: string;
   phone: string;
@@ -21,11 +21,10 @@ export default function RegisterUserForm() {
     handleSubmit,
     formState: { errors, isValid },
     reset,
-  } = useForm<RegisterUserForm>({
+  } = useForm<FormInputs>({
     mode: "onChange",
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      fullName: "",
       email: "",
       password: "",
       phone: "",
@@ -35,27 +34,35 @@ export default function RegisterUserForm() {
     },
   });
 
-  const onSubmit = async (data: RegisterUserForm) => {
-    const payload = {
-      name: `${data.firstName} ${data.lastName}`,
-      email: data.email,
-      password: data.password,
-      phone: data.phone,
-      dni: data.dni,
-      city: data.city,
-      dob: data.dob,
-      role: "user",
+  const onSubmit = async (data: FormInputs) => {
+    const payload: RegisterUserValues = {
+      user: {
+        name: data.fullName,
+        email: data.email,
+        password: data.password,
+        phone: data.phone,
+        dni: data.dni,
+        city: data.city,
+        dob: data.dob,
+        role: "user",
+      },
+      professionalProfile: {
+        biography: "",
+        experience: "",
+        licenseNumber: "",
+        specialty: [],
+      },
     };
 
     try {
       await registerUser(payload);
       alert("Registro exitoso");
       reset();
-    } catch (err: unknown) {
+    } catch (err) {
       if (err instanceof Error) {
         console.error(err);
         alert("Error: " + err.message);
-      } 
+      }
     }
   };
 
@@ -69,12 +76,12 @@ export default function RegisterUserForm() {
           </p>
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {/* Nombre */}
+            {/* Nombre completo */}
             <div>
-              <label className="block text-sm font-medium mb-2">Nombre</label>
+              <label className="block text-sm font-medium mb-2">Nombre completo</label>
               <input
                 type="text"
-                {...register("firstName", {
+                {...register("fullName", {
                   required: "El nombre es obligatorio",
                   pattern: {
                     value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
@@ -83,24 +90,9 @@ export default function RegisterUserForm() {
                 })}
                 className="input-form"
               />
-              {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>}
-            </div>
-
-            {/* Apellido */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Apellido</label>
-              <input
-                type="text"
-                {...register("lastName", {
-                  required: "El apellido es obligatorio",
-                  pattern: {
-                    value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
-                    message: "Solo letras",
-                  },
-                })}
-                className="input-form"
-              />
-              {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>}
+              {errors.fullName && (
+                <p className="text-red-500 text-sm mt-1">{errors.fullName.message}</p>
+              )}
             </div>
 
             {/* Email */}
@@ -117,7 +109,9 @@ export default function RegisterUserForm() {
                 })}
                 className="input-form"
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              )}
             </div>
 
             {/* Contraseña */}
@@ -135,7 +129,9 @@ export default function RegisterUserForm() {
                 })}
                 className="input-form"
               />
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              )}
             </div>
 
             {/* Teléfono */}
@@ -145,11 +141,16 @@ export default function RegisterUserForm() {
                 type="text"
                 {...register("phone", {
                   required: "El teléfono es obligatorio",
-                  minLength: { value: 7, message: "Debe tener al menos 7 caracteres" },
+                  minLength: {
+                    value: 7,
+                    message: "Debe tener al menos 7 caracteres",
+                  },
                 })}
                 className="input-form"
               />
-              {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
+              )}
             </div>
 
             {/* DNI */}
@@ -166,7 +167,9 @@ export default function RegisterUserForm() {
                 })}
                 className="input-form"
               />
-              {errors.dni && <p className="text-red-500 text-sm mt-1">{errors.dni.message}</p>}
+              {errors.dni && (
+                <p className="text-red-500 text-sm mt-1">{errors.dni.message}</p>
+              )}
             </div>
 
             {/* Ciudad */}
@@ -176,11 +179,16 @@ export default function RegisterUserForm() {
                 type="text"
                 {...register("city", {
                   required: "La ciudad es obligatoria",
-                  minLength: { value: 2, message: "Debe tener al menos 2 letras" },
+                  minLength: {
+                    value: 2,
+                    message: "Debe tener al menos 2 letras",
+                  },
                 })}
                 className="input-form"
               />
-              {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>}
+              {errors.city && (
+                <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
+              )}
             </div>
 
             {/* Fecha de nacimiento */}
@@ -193,9 +201,12 @@ export default function RegisterUserForm() {
                 })}
                 className="input-form"
               />
-              {errors.dob && <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>}
+              {errors.dob && (
+                <p className="text-red-500 text-sm mt-1">{errors.dob.message}</p>
+              )}
             </div>
 
+            {/* Botón */}
             <button
               type="submit"
               disabled={!isValid}
@@ -232,6 +243,7 @@ export default function RegisterUserForm() {
     </div>
   );
 }
+
 
 
 

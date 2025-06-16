@@ -1,18 +1,7 @@
-// services/userService.ts
-
-type CreateUserPayload = {
-    name: string;
-    email: string;
-    password: string;
-    phone: string;
-    dni: string;
-    city: string;
-    dob: string;
-    role: string;
-  };
+import { RegisterUserValues } from "@/types/RegisterUser";
   
-  export const registerUser = async (userData: CreateUserPayload) => {
-    const res = await fetch("http://localhost:3001/users/register", {
+  export const registerUser = async (userData: RegisterUserValues) => {
+    const res = await fetch("http://localhost:3001/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),

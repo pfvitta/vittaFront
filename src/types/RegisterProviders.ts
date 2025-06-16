@@ -6,8 +6,8 @@ export type RegisterProviderValues = {
     phone: string;
     dni: string;
     city: string;
-    dob: string; // formato 'YYYY-MM-DD'
-    role: 'profesional'; // obligatorio
+    dob: string; 
+    role: 'provider'; // obligatorio
   };
   professionalProfile: {
     biography: string;
