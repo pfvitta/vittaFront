@@ -34,8 +34,8 @@ const Footer = () => {
         <div className="flex flex-col sm:items-end gap-4">
           <div className="space-x-4">
             <Link href="/providers">Profesionales</Link>
-            <Link href="#">Acerca de nosotros</Link>
-            <Link href="#">Blog</Link>
+            <Link href="/about-us">Acerca de nosotros</Link>
+            <Link href="/blog">Blog</Link>
           </div>
           <div className="flex space-x-4 mt-2 text-xl">
             <a href="#" target="_blank" rel="noopener noreferrer">
