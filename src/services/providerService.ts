@@ -8,7 +8,11 @@ export const registerProvider = async (data: RegisterProviderValues) => {
       body: JSON.stringify(data),
     });
   
-    if (!res.ok) throw new Error("Error al registrar proveedor");
+    if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Error al registrar proveedor");
+    }
+  
     return await res.json();
   };
   

@@ -16,10 +16,10 @@ const defaultValues: RegisterProviderValues = {
     city: "",
     dob: "",
     role: "provider",
-  biography: "",
-  experience: "",
-  licenseNumber: "",
-  specialty: [],
+    biography: "",
+    experience: "",
+    licenseNumber: "",
+    specialty: [],
   },
 };
 
@@ -32,15 +32,14 @@ const specialties = [
   "Trastornos alimenticios",
 ];
 
-
 export default function RegisterProviderForm() {
-  const [, setSubmittedData] = useState<RegisterProviderValues | null>(null);
-
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
     reset,
+    watch,
+    setError,
   } = useForm<RegisterProviderValues>({
     mode: "onChange",
     defaultValues,
@@ -50,13 +49,27 @@ export default function RegisterProviderForm() {
     try {
       const response = await registerProvider(data);
       alert("Registro exitoso");
-      setSubmittedData(response);
       reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Hubo un error al registrar");
+      
+      // Manejo de errores del backend
+      if (error.message.includes("validation")) {
+        const errorData = JSON.parse(error.message);
+        errorData.errors.forEach((err: any) => {
+          setError(err.property as keyof RegisterProviderValues, {
+            type: "server",
+            message: Object.values(err.constraints)[0] as string,
+          });
+        });
+      } else {
+        alert(error.message || "Hubo un error al registrar");
+      }
     }
   };
+
+  // Observar cambios en los checkboxes
+  const selectedSpecialties = watch("specialty");
 
   return (
     <div className="min-h-screen bg-[#F7FAFC] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
@@ -70,11 +83,11 @@ export default function RegisterProviderForm() {
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* --- USER --- */}
+            {/* --- PROVIDER --- */}
             <div>
               <label className="block text-sm font-medium mb-1">Nombre completo</label>
               <input
-                {...register("user.name", {
+                {...register("name", {
                   required: "El nombre es obligatorio",
                   pattern: {
                     value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
@@ -83,14 +96,14 @@ export default function RegisterProviderForm() {
                 })}
                 className="input-form"                
               />
-              {errors.user?.name && <p className="text-red-500 text-sm">{errors.user.name.message}</p>}
+              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Correo electrónico</label>
               <input
                 type="email"
-                {...register("user.email", {
+                {...register("email", {
                   required: "El correo es obligatorio",
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -99,14 +112,14 @@ export default function RegisterProviderForm() {
                 })}
                 className="input-form"
               />
-              {errors.user?.email && <p className="text-red-500 text-sm">{errors.user.email.message}</p>}
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Contraseña</label>
               <input
                 type="password"
-                {...register("user.password", {
+                {...register("password", {
                   required: "La contraseña es obligatoria",
                   minLength: { value: 6, message: "Mínimo 6 caracteres" },
                   pattern: {
@@ -116,13 +129,13 @@ export default function RegisterProviderForm() {
                 })}
                 className="input-form"
               />
-              {errors.user?.password && <p className="text-red-500 text-sm">{errors.user.password.message}</p>}
+              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Teléfono</label>
               <input
-                {...register("user.phone", {
+                {...register("phone", {
                   required: "El teléfono es obligatorio",
                   minLength: {
                     value: 7,
@@ -131,13 +144,13 @@ export default function RegisterProviderForm() {
                 })} 
                 className="input-form"
               />
-              {errors.user?.phone && <p className="text-red-500 text-sm">{errors.user.phone.message}</p>}
+              {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">DNI</label>
               <input
-                {...register("user.dni", {
+                {...register("dni", {
                   required: "El documento es obligatorio",
                   pattern: {
                     value: /^\d{5,10}$/,
@@ -146,114 +159,113 @@ export default function RegisterProviderForm() {
                 })}
                 className="input-form"
               />
-              {errors.user?.dni && <p className="text-red-500 text-sm">{errors.user.dni.message}</p>}
+              {errors.dni && <p className="text-red-500 text-sm">{errors.dni.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Ciudad</label>
               <input
-                {...register("user.city", {
+                {...register("city", {
                   required: "La ciudad es obligatoria",
                   minLength: { value: 2, message: "Debe tener al menos 2 letras" },
                 })}
                 className="input-form"
               />
-              {errors.user?.city && <p className="text-red-500 text-sm">{errors.user.city.message}</p>}
+              {errors.city && <p className="text-red-500 text-sm">{errors.city.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Fecha de nacimiento</label>
               <input
                 type="date"
-                {...register("user.dob", {
+                {...register("dob", {
                   required: "La fecha es obligatoria",
                 })}
                 className="input-form"
               />
-              {errors.user?.dob && <p className="text-red-500 text-sm">{errors.user.dob.message}</p>}
+              {errors.dob && <p className="text-red-500 text-sm">{errors.dob.message}</p>}
             </div>
 
             {/* --- PROFILE --- */}
             <div>
               <label className="block text-sm font-medium mb-1">Biografía</label>
               <textarea
-                {...register("user.biography", {
+                {...register("biography", {
                   required: "La biografía es obligatoria",
                   minLength: { value: 10, message: "Mínimo 10 caracteres" },
                 })}
                 className="input-form"
               />
-              {errors.user?.biography && (
-                <p className="text-red-500 text-sm">{errors.user.biography.message}</p>
+              {errors.biography && (
+                <p className="text-red-500 text-sm">{errors.biography.message}</p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Experiencia</label>
               <textarea
-                {...register("user.experience", {
+                {...register("experience", {
                   required: "La experiencia es obligatoria",
                   minLength: { value: 10, message: "Mínimo 10 caracteres" },
                 })}
                 className="input-form"
               />
-              {errors.user?.experience && (
-                <p className="text-red-500 text-sm">{errors.user.experience.message}</p>
+              {errors.experience && (
+                <p className="text-red-500 text-sm">{errors.experience.message}</p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Matrícula profesional</label>
               <input
-                {...register("user.licenseNumber", {
+                {...register("licenseNumber", {
                   required: "Campo obligatorio",
                   minLength: { value: 6, message: "Debe tener mínimo 6 caracteres" },
                 })}
                 className="input-form"
               />
-              {errors.user?.licenseNumber && (
-                <p className="text-red-500 text-sm">{errors.user.licenseNumber.message}</p>
+              {errors.licenseNumber && (
+                <p className="text-red-500 text-sm">{errors.licenseNumber.message}</p>
+              )}
+            </div>
+              {/*----CHECKBOXS----*/}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Especialidades (selecciona al menos una)
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {specialties.map((spec) => (
+                  <label key={spec} className="inline-flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      value={spec}
+                      {...register("specialty", {
+                        validate: (value) => 
+                          value?.length > 0 || "Selecciona al menos una especialidad",
+                      })}
+                      className="rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <span>{spec}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.specialty && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.specialty.message}
+                </p>
               )}
             </div>
 
-            <div>
-  <label className="block text-sm font-medium mb-2">
-    Especialidades (selecciona al menos una)
-  </label>
-  <div className="grid grid-cols-1 gap-2">
-    {specialties.map((spec) => (
-      <label key={spec} className="inline-flex items-center space-x-2">
-        <input
-          type="checkbox"
-          value={spec}
-          {...register("user.specialty", {
-            required: "Selecciona al menos una especialidad",
-          })}
-          className="rounded border-gray-300 text-primary focus:ring-primary"
-        />
-        <span>{spec}</span>
-      </label>
-    ))}
-  </div>
-  {errors.user?.specialty && (
-    <p className="text-red-500 text-sm mt-1">
-      {errors.user.specialty.message}
-    </p>
-  )}
-</div>
-
-            {/* --- SUBMIT --- */}
-
             <button
               type="submit"
-              disabled={!isValid}
+              disabled={!isValid || isSubmitting}
               className={`w-full px-4 py-2 rounded-full text-sm border transition ${
-                isValid
+                isValid && !isSubmitting
                   ? "bg-primary text-white border-primary hover:bg-secondary"
                   : "bg-gray-300 text-gray-600 cursor-not-allowed"
               }`}
             >
-              Registrarse
+              {isSubmitting ? "Registrando..." : "Registrarse"}
             </button>
           </form>
         </div>
@@ -271,4 +283,3 @@ export default function RegisterProviderForm() {
     </div>
   );
 }
-
