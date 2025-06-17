@@ -19,6 +19,8 @@ const Navbar = () => {
           </Link>
         </div>
 
+        
+
         {/* Links */}
         <nav className="space-x-10 text-md font-medium text-secondary">
           <Link href="/providers">Profesionales</Link>
@@ -26,15 +28,17 @@ const Navbar = () => {
           <Link href="blog">Blog</Link>
         </nav>
 
-        <Link href="/login" className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-        Iniciar sesión</Link>
-
-        {/* Botón */}
-        <Link href="/register">
-        <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-          Empieza aquí
-        </button>
-        </Link>
+        <div>
+          <Link href="/login" className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+          Iniciar sesión</Link>
+          {/* Botón */}
+          <Link href="/register">
+            <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+            Empieza aquí
+            </button>
+          </Link>
+        </div>
+        
         
       </div>
     </header>
