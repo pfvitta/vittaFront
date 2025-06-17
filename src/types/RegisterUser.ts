@@ -9,11 +9,5 @@ export type RegisterUserValues = {
     dob: string; 
     role: 'user'; // obligatorio
   };
-  professionalProfile: {
-    biography: "";
-    experience: "";
-    licenseNumber: "";
-    specialty: ""[]; 
-  };
 };
   

@@ -16,12 +16,10 @@ const defaultValues: RegisterProviderValues = {
     city: "",
     dob: "",
     role: "provider",
-  },
-  professionalProfile: {
-    biography: "",
-    experience: "",
-    licenseNumber: "",
-    specialty: [],
+  biography: "",
+  experience: "",
+  licenseNumber: "",
+  specialty: [],
   },
 };
 
@@ -179,42 +177,42 @@ export default function RegisterProviderForm() {
             <div>
               <label className="block text-sm font-medium mb-1">Biografía</label>
               <textarea
-                {...register("professionalProfile.biography", {
+                {...register("user.biography", {
                   required: "La biografía es obligatoria",
                   minLength: { value: 10, message: "Mínimo 10 caracteres" },
                 })}
                 className="input-form"
               />
-              {errors.professionalProfile?.biography && (
-                <p className="text-red-500 text-sm">{errors.professionalProfile.biography.message}</p>
+              {errors.user?.biography && (
+                <p className="text-red-500 text-sm">{errors.user.biography.message}</p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Experiencia</label>
               <textarea
-                {...register("professionalProfile.experience", {
+                {...register("user.experience", {
                   required: "La experiencia es obligatoria",
                   minLength: { value: 10, message: "Mínimo 10 caracteres" },
                 })}
                 className="input-form"
               />
-              {errors.professionalProfile?.experience && (
-                <p className="text-red-500 text-sm">{errors.professionalProfile.experience.message}</p>
+              {errors.user?.experience && (
+                <p className="text-red-500 text-sm">{errors.user.experience.message}</p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Matrícula profesional</label>
               <input
-                {...register("professionalProfile.licenseNumber", {
+                {...register("user.licenseNumber", {
                   required: "Campo obligatorio",
                   minLength: { value: 6, message: "Debe tener mínimo 6 caracteres" },
                 })}
                 className="input-form"
               />
-              {errors.professionalProfile?.licenseNumber && (
-                <p className="text-red-500 text-sm">{errors.professionalProfile.licenseNumber.message}</p>
+              {errors.user?.licenseNumber && (
+                <p className="text-red-500 text-sm">{errors.user.licenseNumber.message}</p>
               )}
             </div>
 
@@ -228,7 +226,7 @@ export default function RegisterProviderForm() {
         <input
           type="checkbox"
           value={spec}
-          {...register("professionalProfile.specialty", {
+          {...register("user.specialty", {
             required: "Selecciona al menos una especialidad",
           })}
           className="rounded border-gray-300 text-primary focus:ring-primary"
@@ -237,9 +235,9 @@ export default function RegisterProviderForm() {
       </label>
     ))}
   </div>
-  {errors.professionalProfile?.specialty && (
+  {errors.user?.specialty && (
     <p className="text-red-500 text-sm mt-1">
-      {errors.professionalProfile.specialty.message}
+      {errors.user.specialty.message}
     </p>
   )}
 </div>

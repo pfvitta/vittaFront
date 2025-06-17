@@ -46,12 +46,6 @@ export default function RegisterUserForm() {
         dob: data.dob,
         role: "user",
       },
-      professionalProfile: {
-        biography: "",
-        experience: "",
-        licenseNumber: "",
-        specialty: [],
-      },
     };
 
     try {
