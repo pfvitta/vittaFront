@@ -3,6 +3,7 @@
 
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { FaMapMarkerAlt, FaBirthdayCake, FaIdCard } from 'react-icons/fa';
 
 export default function ProviderProfile() {
@@ -95,9 +96,11 @@ export default function ProviderProfile() {
             <li>La tolerancia de espera es de 10 min.</li>
             <li>Disponer de micrófono y cámara.</li>
           </ul>
+          <Link href="/appointments">
           <button className="mt-4 bg-secondary text-white px-4 py-2 rounded-full text-sm hover:bg-primary transition">
             Agendar turno
           </button>
+          </Link>
         </div>
 
         {/* Membresía */}
@@ -105,9 +108,11 @@ export default function ProviderProfile() {
           <h2 className="text-xl font-bold text-secondary mb-2">Membresía</h2>
           <p className="text-primary font-bold text-lg">{mockProvider.precio}</p>
           <p className="text-sm text-gray-600 mt-1">{mockProvider.beneficio}</p>
+          <Link href="/memberships">
           <button className="mt-4 bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary transition">
             Acceder ahora
           </button>
+          </Link>
         </div>
       </div>
     </div>
