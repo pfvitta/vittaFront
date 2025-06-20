@@ -29,10 +29,15 @@ const Navbar = () => {
         </nav>
 
         <div>
-          <Link href="/login" className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+          <Link href="/login" className="  text-primary px-4 py-2 rounded-full text-bold text-sm hover:text-secondary transition">
           Iniciar sesión</Link>
           {/* Botón */}
-          <Link href="/register">
+          <Link href="/register/provider">
+            <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+            Soy nutricionista
+            </button>
+          </Link>
+          <Link href="/register/user">
             <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
             Empieza aquí
             </button>

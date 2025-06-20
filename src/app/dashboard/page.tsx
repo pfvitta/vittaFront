@@ -1,9 +1,12 @@
+import Dashboard from "@/components/Dashboard/Dashboard";
 
 
-function dashboardPage() {
-  return (
-    <div>dashboardPage</div>
-  )
+const DashboardPage = () => {
+    return (
+        <div>
+          <Dashboard />  
+        </div>
+    )
 }
 
-export default dashboardPage
+export default DashboardPage;

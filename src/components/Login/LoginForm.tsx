@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { loginUser } from "@/services/authService";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
 
 type LoginFormValues = {
   email: string;
@@ -11,6 +12,7 @@ type LoginFormValues = {
 };
 
 export default function Login() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -32,7 +34,7 @@ export default function Login() {
       }
 
       console.log("Usuario autenticado:", response);
-      alert("Inicio de sesión exitoso");
+      router.push('/dashboard');
       
       // Aquí redirigir al usuario o manejar el estado de autenticación
       // router.push('/dashboard');
