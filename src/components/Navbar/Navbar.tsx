@@ -1,11 +1,66 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { User } from "lucide-react";
 
 const Navbar = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
+
+  // Asegura render en cliente
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Verifica si hay token e id en localStorage
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    if (token && userId) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // Escucha cambios en otras pestañas
+  useEffect(() => {
+    const syncAuth = () => {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+      setIsAuthenticated(!!token && !!userId);
+    };
+    window.addEventListener("storage", syncAuth);
+    return () => window.removeEventListener("storage", syncAuth);
+  }, []);
+
+  // Cerrar sesión
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    setIsAuthenticated(false);
+    router.push("/login");
+  };
+
+  // Cierra dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <header className=" bg-white shadow-sm py-2">
+    <header className="bg-white shadow-sm py-2">
       <div className="max-w-screen-xl h-[60px] mx-auto flex items-center justify-between px-4 rounded-[100px] bg-white drop-shadow-lg">
-        {/* Logo + Marca */}
+        {/* Logo */}
         <div className="flex items-center space-x-2">
           <Link href="/" passHref>
             <Image
@@ -13,44 +68,80 @@ const Navbar = () => {
               alt="Logo Vitta"
               width={80}
               height={80}
-              className="-my-1 cursor-pointer" // cursor para indicar clic
+              className="-my-1 cursor-pointer"
               priority
             />
           </Link>
         </div>
 
-        
-
         {/* Links */}
         <nav className="space-x-8 text-md font-medium text-secondary">
           <Link href="/providers">Profesionales</Link>
           <Link href="/about-us">Acerca de nosotros</Link>
-          <Link href="blog">Blog</Link>
+          <Link href="/blog">Blog</Link>
         </nav>
 
-        <div className="flex items-center space-x-2">
-          <Link href="/login" className="  text-primary px-4 py-2 rounded-full text-bold text-sm hover:text-secondary transition">
-          Iniciar sesión</Link>
-          {/* Botón */}
-          <Link href="/register/provider">
-            <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-            Soy nutricionista
-            </button>
-          </Link>
-          <Link href="/register/user">
-            <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-            Empieza aquí
-            </button>
-          </Link>
-        </div>
-        
-        
+        {/* Autenticación */}
+        {isClient && (
+          <div className="flex items-center space-x-2 relative">
+            {!isAuthenticated ? (
+              <>
+                <Link
+                  href="/login"
+                  className="text-primary px-4 py-2 rounded-full text-bold text-sm hover:text-secondary transition"
+                >
+                  Iniciar sesión
+                </Link>
+                <Link href="/register/provider">
+                  <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                    Soy nutricionista
+                  </button>
+                </Link>
+                <Link href="/register/user">
+                  <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                    Empieza aquí
+                  </button>
+                </Link>
+              </>
+            ) : (
+              <div className="relative" ref={dropdownRef}>
+                <button onClick={() => setShowDropdown((prev) => !prev)}>
+                  <User className="w-6 h-6 text-secondary hover:text-primary" />
+                </button>
+
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-md z-50">
+                    <Link
+                      href="/dashboard"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Mi perfil
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                )}
+                <Link href="/membership">
+                  <button className="ml-3 bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                    Acceder a membresía
+                  </button>
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );
 };
 
 export default Navbar;
+
+
 
 
 

@@ -3,10 +3,9 @@ export const loginUser = async (credentials: { email: string; password: string }
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
-    credentials: 'include', // Si usas cookies
+    credentials: 'include',
   });
 
-  // Manejar respuesta vacía (204)
   if (res.status === 204) {
     return null;
   }
@@ -16,6 +15,9 @@ export const loginUser = async (credentials: { email: string; password: string }
   if (!res.ok) {
     throw new Error(data.message || "Error al iniciar sesión");
   }
+
+  // ✅ Guardar datos del usuario en localStorage
+  localStorage.setItem("user", JSON.stringify(data));
 
   return data;
 };

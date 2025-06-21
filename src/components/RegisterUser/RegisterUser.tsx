@@ -4,11 +4,13 @@ import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { registerUser } from "@/services/userService";
 import { RegisterUserValues } from "@/types/RegisterUser";
+import { useRouter } from "next/navigation";
 
 type FormInputs = {
   fullName: string;
   email: string;
   password: string;
+  confirmPassword: string; 
   phone: string;
   dni: string;
   city: string;
@@ -34,12 +36,15 @@ export default function RegisterUserForm() {
     },
   });
 
+  const router = useRouter();
+
   const onSubmit = async (data: FormInputs) => {
     const payload: RegisterUserValues = {
       user: {
         name: data.fullName,
         email: data.email,
         password: data.password,
+        confirmPassword: "",
         phone: data.phone,
         dni: data.dni,
         city: data.city,
@@ -49,9 +54,11 @@ export default function RegisterUserForm() {
     };
 
     try {
-      await registerUser(payload);
+      const response = await registerUser(payload);
+      localStorage.setItem("user", JSON.stringify(response.user));
       alert("Registro exitoso");
       reset();
+      router.push("/login"); 
     } catch (err) {
       if (err instanceof Error) {
         console.error(err);
@@ -61,13 +68,24 @@ export default function RegisterUserForm() {
   };
 
   return (
+
+    
     <div className="min-h-screen bg-[#F7FAFC] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="flex flex-col md:flex-row w-full max-w-5xl shadow-xl rounded-lg overflow-hidden">
         <div className="bg-white p-8 md:rounded-l-lg rounded-t-lg md:rounded-tr-none shadow-sm w-full md:w-auto">
+        <div className="mt-2 mb-2 text-right">
+            <p className="text-sm text-secondary">
+              ¿Ya tienes una cuenta?{" "}
+              <a href="/login" className="text-primary hover:text-secondary font-medium transition">
+                Inicia sesión
+              </a>
+            </p>
+          </div>
           <h2 className="text-2xl font-semibold text-center text-secondary mb-4">Crear una cuenta</h2>
           <p className="text-center text-secondary text-sm mb-8">
             Completa el formulario para registrarte como usuario
           </p>
+
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {/* Nombre completo */}
@@ -127,6 +145,29 @@ export default function RegisterUserForm() {
                 <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
               )}
             </div>
+
+            {/* Validación de contraseña */}
+<div>
+  <label className="block text-sm font-medium mb-2">Confirmar contraseña</label>
+  <input
+    type="password"
+    {...register("confirmPassword", {
+      required: "La confirmación es obligatoria",
+      validate: (value, formValues) =>
+        value === formValues.password || "Las contraseñas no coinciden",
+      minLength: { value: 6, message: "Mínimo 6 caracteres" },
+      pattern: {
+        value: /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/,
+        message: "Debe tener mayúscula, número y símbolo",
+      },
+    })}
+    className="input-form"
+  />
+  {errors.confirmPassword && (
+    <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+  )}
+</div>
+
 
             {/* Teléfono */}
             <div>
@@ -214,14 +255,6 @@ export default function RegisterUserForm() {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-secondary">
-              ¿Ya tienes una cuenta?{" "}
-              <a href="/login" className="text-primary hover:text-secondary font-medium transition">
-                Inicia sesión
-              </a>
-            </p>
-          </div>
         </div>
 
         <div className="relative w-full h-[500px] md:h-auto md:flex-1">

@@ -14,4 +14,21 @@ import { RegisterUserValues } from "@/types/RegisterUser";
   
     return await res.json();
   };
+
+
+  export const getUserById = async (id: string, token: string) => {
+    const res = await fetch(`http://localhost:4000/users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  
+    if (!res.ok) {
+      throw new Error("No se pudo obtener el usuario");
+    }
+  
+    return await res.json();
+  };
+  
+
   
