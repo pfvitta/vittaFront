@@ -5,6 +5,8 @@ import { loginUser } from '@/services/authService';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getUserById } from '@/services/userService';
+import { jwtDecode } from "jwt-decode";
 
 
 type LoginFormValues = {
@@ -18,46 +20,63 @@ export default function Login() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setError,
   } = useForm<LoginFormValues>({ mode: 'onChange' });
 
   const [serverError, setServerError] = useState<string | null>(null);
  
 
+  type TokenPayload = {
+    sub: string; // suele ser el userId
+    role?: string;
+  };
+  
   const onSubmit = async (data: LoginFormValues) => {
     setServerError(null);
+  
     try {
-      const response = await loginUser(data);
-      console.log('Respuesta del servidor:', response);
+      const response = await loginUser(data); // espera { token }
   
-      if (!response || !response.token) {
-        throw new Error('Respuesta inválida del servidor');
+      const { token } = response;
+  
+      if (!token) {
+        throw new Error("Falta token en la respuesta del login");
       }
   
-      // Guardar el token si existe
-      localStorage.setItem('token', response.token);
+      // 🔓 Decodificar el token
+      const decoded: TokenPayload = jwtDecode(token);
   
-      // Guardar el usuario solo si está presente
-      if (response.user) {
-        localStorage.setItem('user', JSON.stringify(response.user));
-      } else {
-        console.warn("No se recibió 'user' en la respuesta del login:", response);
+      const userId = decoded.sub;
+      const role = decoded.role;
+  
+      if (!userId) {
+        throw new Error("El token no contiene userId");
       }
   
-      router.push('/dashboard');
+      // 🧠 Guardar el token y tipo de usuario
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("role", role || "user");
+  
+      // 🔄 Obtener datos del usuario
+      const user = await getUserById(userId, token);
+      localStorage.setItem("user", JSON.stringify(user));
+  
+      // ✅ Redirigir al dashboard
+      router.push("/dashboard");
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.error('Error de autenticación:', error.message);
-        setServerError(error.message || 'Error al iniciar sesión');
-  
-        if (error.message.includes('email')) {
-          setError('email', { type: 'server', message: error.message });
-        } else if (error.message.includes('contraseña')) {
-          setError('password', { type: 'server', message: error.message });
-        }
+        console.error("Login error:", error.message);
+        setServerError(error.message || "Error al iniciar sesión");
+      } else {
+        console.error("Unexpected error:", error);
+        setServerError("Error inesperado al iniciar sesión");
       }
     }
   };
+  
+  
+  
+  
   
 
   return (
@@ -148,4 +167,7 @@ export default function Login() {
     </div>
   );
 }
+
+
+// Removed unused setError function as it is not implemented or used.
 

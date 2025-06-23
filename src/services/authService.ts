@@ -6,18 +6,14 @@ export const loginUser = async (credentials: { email: string; password: string }
     credentials: 'include',
   });
 
-  if (res.status === 204) {
-    return null;
-  }
-
   const data = await res.json();
+
+  console.log("Respuesta completa del backend (loginUser):", data);
 
   if (!res.ok) {
     throw new Error(data.message || "Error al iniciar sesión");
   }
 
-  // ✅ Guardar datos del usuario en localStorage
-  localStorage.setItem("user", JSON.stringify(data));
-
   return data;
 };
+
