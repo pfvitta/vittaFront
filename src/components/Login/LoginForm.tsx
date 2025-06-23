@@ -2,82 +2,59 @@
 
 import { useForm } from 'react-hook-form';
 import { loginUser } from '@/services/authService';
+import { getUserById } from '@/services/userService';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUserById } from '@/services/userService';
-import { jwtDecode } from "jwt-decode";
-
+import { jwtDecode } from 'jwt-decode';
+import { useAuth } from '../../context/AuthContext'; // ✅ asegúrate que esta ruta esté correcta
 
 type LoginFormValues = {
   email: string;
   password: string;
 };
 
+type TokenPayload = {
+  sub: string;
+  role?: string;
+};
+
 export default function Login() {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({ mode: 'onChange' });
-
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormValues>({ mode: 'onChange' });
   const [serverError, setServerError] = useState<string | null>(null);
- 
+  const { login } = useAuth(); // ✅ traemos la función desde el contexto
 
-  type TokenPayload = {
-    sub: string; // suele ser el userId
-    role?: string;
-  };
-  
   const onSubmit = async (data: LoginFormValues) => {
     setServerError(null);
-  
     try {
-      const response = await loginUser(data); // espera { token }
-  
+      const response = await loginUser(data); // 👈 te devuelve { token }
+
       const { token } = response;
-  
-      if (!token) {
-        throw new Error("Falta token en la respuesta del login");
-      }
-  
-      // 🔓 Decodificar el token
-      const decoded: TokenPayload = jwtDecode(token);
-  
+      if (!token) throw new Error("Falta token en la respuesta del login");
+
+      // ✅ Decodificamos el token
+      const decoded = jwtDecode<TokenPayload>(token);
       const userId = decoded.sub;
-      const role = decoded.role;
-  
-      if (!userId) {
-        throw new Error("El token no contiene userId");
-      }
-  
-      // 🧠 Guardar el token y tipo de usuario
-      localStorage.setItem("token", token);
-      localStorage.setItem("userId", userId);
-      localStorage.setItem("role", role || "user");
-  
-      // 🔄 Obtener datos del usuario
+      const role = decoded.role || 'user';
+
+      if (!userId) throw new Error("El token no contiene userId");
+
+      // ✅ Obtenemos la información del usuario
       const user = await getUserById(userId, token);
-      localStorage.setItem("user", JSON.stringify(user));
-  
-      // ✅ Redirigir al dashboard
-      router.push("/dashboard");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Login error:", error.message);
-        setServerError(error.message || "Error al iniciar sesión");
-      } else {
-        console.error("Unexpected error:", error);
-        setServerError("Error inesperado al iniciar sesión");
-      }
+
+      // ✅ Usamos la función login del contexto
+      login(user, token, role);
+
+      // ✅ Navegamos al dashboard
+      router.push('/dashboard');
+
+    } catch (error) {
+      const err = error as Error;
+      console.error("Login error:", err.message);
+      setServerError(err.message || "Error al iniciar sesión");
     }
   };
-  
-  
-  
-  
-  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-tertiary bg-opacity-80 px-4">
@@ -145,7 +122,7 @@ export default function Login() {
         <div>
           <p className="mt-4 text-sm text-gray-600 text-center">
             ¿No tienes una cuenta?{' '}
-            <a href="register/user" className="text-teal-700 hover:underline">
+            <a href="/register/user" className="text-teal-700 hover:underline">
               Regístrate aquí
             </a>
           </p>
@@ -169,5 +146,6 @@ export default function Login() {
 }
 
 
-// Removed unused setError function as it is not implemented or used.
+
+
 

@@ -2,49 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
+import { useAuth } from "@/context/AuthContext"; // ✅ nuevo
 
 const Navbar = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  const { isAuthenticated, logout } = useAuth(); // ✅ usamos el contexto
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
-
-  // Asegura render en cliente
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Verifica si hay token e id en localStorage
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
-    if (token && userId) {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  // Escucha cambios en otras pestañas
-  useEffect(() => {
-    const syncAuth = () => {
-      const token = localStorage.getItem("token");
-      const userId = localStorage.getItem("userId");
-      setIsAuthenticated(!!token && !!userId);
-    };
-    window.addEventListener("storage", syncAuth);
-    return () => window.removeEventListener("storage", syncAuth);
-  }, []);
-
-  // Cerrar sesión
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    setIsAuthenticated(false);
-    router.push("/login");
-  };
 
   // Cierra dropdown al hacer clic fuera
   useEffect(() => {
@@ -56,6 +23,11 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
 
   return (
     <header className="bg-white shadow-sm py-2">
@@ -82,64 +54,63 @@ const Navbar = () => {
         </nav>
 
         {/* Autenticación */}
-        {isClient && (
-          <div className="flex items-center space-x-2 relative">
-            {!isAuthenticated ? (
-              <>
-                <Link
-                  href="/login"
-                  className="text-primary px-4 py-2 rounded-full text-bold text-sm hover:text-secondary transition"
-                >
-                  Iniciar sesión
-                </Link>
-                <Link href="/register/provider">
-                  <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-                    Soy nutricionista
-                  </button>
-                </Link>
-                <Link href="/register/user">
-                  <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-                    Empieza aquí
-                  </button>
-                </Link>
-              </>
-            ) : (
-              <div className="relative" ref={dropdownRef}>
-                <button onClick={() => setShowDropdown((prev) => !prev)}>
-                  <User className="w-6 h-6 text-secondary hover:text-primary" />
+        <div className="flex items-center space-x-2 relative">
+          {!isAuthenticated ? (
+            <>
+              <Link
+                href="/login"
+                className="text-primary px-4 py-2 rounded-full text-bold text-sm hover:text-secondary transition"
+              >
+                Iniciar sesión
+              </Link>
+              <Link href="/register/provider">
+                <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                  Soy nutricionista
                 </button>
+              </Link>
+              <Link href="/register/user">
+                <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                  Empieza aquí
+                </button>
+              </Link>
+            </>
+          ) : (
+            <div className="relative" ref={dropdownRef}>
+              <button onClick={() => setShowDropdown((prev) => !prev)}>
+                <User className="w-6 h-6 text-secondary hover:text-primary" />
+              </button>
 
-                {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-md z-50">
-                    <Link
-                      href="/dashboard"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Mi perfil
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                    >
-                      Cerrar sesión
-                    </button>
-                  </div>
-                )}
-                <Link href="/membership">
-                  <button className="ml-3 bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-                    Acceder a membresía
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-md z-50">
+                  <Link
+                    href="/dashboard"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Mi perfil
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Cerrar sesión
                   </button>
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
+                </div>
+              )}
+              <Link href="/membership">
+                <button className="ml-3 bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                  Acceder a membresía
+                </button>
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
 };
 
 export default Navbar;
+
 
 
 
