@@ -33,7 +33,7 @@ export default function Dashboard() {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("user");
-    window.location.href = "/login"; // o usa router.push si prefieres
+    window.location.href = "/login"; 
   };
   
 
