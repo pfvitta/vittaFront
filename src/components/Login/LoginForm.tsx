@@ -47,7 +47,7 @@ export default function Login() {
       login(user, token, role);
 
       // ✅ Navegamos al dashboard
-      router.push('/dashboard');
+      router.push('/dashboard/user');
 
     } catch (error) {
       const err = error as Error;

@@ -68,7 +68,7 @@ const Navbar = () => {
                   Soy nutricionista
                 </button>
               </Link>
-              <Link href="/register/user">
+              <Link href="http://localhost:4000/auth/login">
                 <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
                   Empieza aquí
                 </button>
