@@ -96,7 +96,7 @@ const Navbar = () => {
                   </button>
                 </div>
               )}
-              <Link href="/membership">
+              <Link href="/memberships">
                 <button className="ml-3 bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
                   Acceder a membresía
                 </button>
