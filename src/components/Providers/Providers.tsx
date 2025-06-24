@@ -75,7 +75,7 @@ function Providers() {
           id={provider.id}
           name={provider.name}
           imageUrl={provider.avatarUrl}
-          specialty={provider.specialty || []}
+          specialty={provider.specialty.name || []}
           biography={provider.biography}
         />
       ))}

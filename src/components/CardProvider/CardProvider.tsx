@@ -1,6 +1,10 @@
 // CardProvider.tsx
+'use client'; // Añade esto porque usamos hooks del cliente
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext'; 
 
 interface CardProviderProps {
   id: string; 
@@ -11,8 +15,20 @@ interface CardProviderProps {
 }
 
 const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  const handleProfileClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      alert("Debes iniciar sesion para poder ver el perfil de los profesionales")
+      router.push('/login'); // Redirige a la página de login
+      
+    }
+  };
+
   return (
-    <div className="flex bg-[#F8FBFE] rounded-xl shadow-md p-4 max-w-3xl w-full">
+    <div className="flex bg-gray-100 rounded-xl shadow-md p-4 max-w-3xl w-full">
       {/* Imagen */}
       <div className="w-24 h-24 relative rounded-lg overflow-hidden mr-4">
         <Image src={imageUrl} alt={name} fill className="object-cover" />
@@ -42,11 +58,17 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
 
         {/* Botón ver perfil */}
         <div className='flex justify-end'>
-        <Link href={`/providers/${id}`}>
-          <button className="text-sm px-4 py-2 rounded-full bg-primary text-white hover:bg-secondary transition">
-            Ver perfil
-          </button>
-        </Link>
+          <Link 
+            href={isAuthenticated ? `/providers/${id}` : '/auth/login'}
+            passHref
+          >
+            <button 
+              onClick={handleProfileClick}
+              className="text-sm px-4 py-2 rounded-full bg-primary text-white hover:bg-secondary transition"
+            >
+              Ver perfil
+            </button>
+          </Link>
         </div>
       </div>
     </div>
@@ -54,4 +76,3 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
 };
 
 export default CardProvider;
-
