@@ -5,6 +5,7 @@ import { registerProvider } from "@/services/providerService";
 import { RegisterProviderValues } from "@/types/RegisterProviders";
 import Image from "next/image";
 import { useState } from "react";
+import {useRouter} from 'next/navigation'
 
 const defaultValues: RegisterProviderValues = {
   user: {
@@ -34,6 +35,7 @@ const specialties = [
 
 
 export default function RegisterProviderForm() {
+  
   const [, setSubmittedData] = useState<RegisterProviderValues | null>(null);
 
   const {
@@ -45,13 +47,15 @@ export default function RegisterProviderForm() {
     mode: "onChange",
     defaultValues,
   });
-
+  
+  const router = useRouter();
   const onSubmit = async (data: RegisterProviderValues) => {
     try {
       const response = await registerProvider(data);
       alert("Registro exitoso");
       setSubmittedData(response);
       reset();
+      router.push("/dashboard/provider");
     } catch (error) {
       console.error(error);
       alert("Hubo un error al registrar");

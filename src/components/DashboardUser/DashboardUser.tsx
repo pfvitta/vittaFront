@@ -16,7 +16,7 @@ import React, { useEffect, useState, ReactNode } from 'react';
 import Link from 'next/link';
 
 
-export default function Dashboard() {
+export default function DashboardUser() {
   type UserData = {
     name: string;
     email: string;
@@ -33,24 +33,29 @@ export default function Dashboard() {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("user");
-    window.location.href = "/login"; 
+    window.location.href = "http://localhost:4000/auth/logout"; // o usa router.push si prefieres
   };
   
 
   useEffect(() => {
+  const fetchUser = async () => {
     try {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser && storedUser !== "undefined") {
-        const parsed = JSON.parse(storedUser);
-        console.log("Usuario desde localStorage:", parsed);
-        setUser(parsed);
-      }
+      const res = await fetch('http://localhost:4000/auth/me', {
+        credentials: 'include', // 👈 NECESARIO para enviar la cookie de sesión
+      });
+
+      if (!res.ok) throw new Error('No autorizado');
+
+      const data = await res.json();
+      localStorage.setItem('user', JSON.stringify(data));
+      setUser(data);
     } catch (error) {
-      console.error("Error al obtener el usuario de localStorage:", error);
-      setUser(null);
+      console.error('Error cargando la sesión:', error);
     }
-  }, []);
-  
+  };
+
+  fetchUser();
+}, [])
   
   
 
