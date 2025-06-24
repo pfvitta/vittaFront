@@ -1,9 +1,8 @@
-// CardProvider.tsx
 import Image from 'next/image';
 import Link from 'next/link';
 
 interface CardProviderProps {
-  id: string; 
+  id: string;
   name: string;
   imageUrl: string;
   specialty: string[];
@@ -54,4 +53,5 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
 };
 
 export default CardProvider;
+
 

@@ -1,4 +1,3 @@
-// context/ProvidersContext.tsx
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -56,7 +55,7 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
     setError(null);
     try {
       const data = await getProviders();
-      
+     
       const normalizedProviders = data.map(provider => ({
         ...provider,
         specialty: provider.specialty || [], // Asegura que specialty sea un array
@@ -69,7 +68,7 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error fetching providers:', err);
-      
+     
       const savedProviders = localStorage.getItem('providersData');
       if (savedProviders) {
         try {
@@ -89,12 +88,12 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
   }, []);
 
   return (
-    <ProvidersContext.Provider 
-      value={{ 
-        providers, 
-        loading, 
+    <ProvidersContext.Provider
+      value={{
+        providers,
+        loading,
         error,
-        refreshProviders: fetchProviders 
+        refreshProviders: fetchProviders
       }}
     >
       {children}

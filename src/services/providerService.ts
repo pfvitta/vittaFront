@@ -16,7 +16,7 @@ export const registerProvider = async (data: RegisterProviderValues) => {
     return await res.json();
   };
   
-  // services/providerService.ts
+
 // services/providerService.ts
 import { Provider } from '@/context/ProvidersContext';
 
