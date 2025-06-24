@@ -1,5 +1,6 @@
 export type RegisterProviderValues = {
   user: {
+    
     name: string;
     email: string;
     password: string;
