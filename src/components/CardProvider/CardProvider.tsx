@@ -6,11 +6,11 @@ interface CardProviderProps {
   id: string; 
   name: string;
   imageUrl: string;
-  tags: string[];
-  description: string;
+  specialty: string[];
+  biography: string;
 }
 
-const CardProvider = ({ id, name, imageUrl, tags, description }: CardProviderProps) => {
+const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
   return (
     <div className="flex bg-[#F8FBFE] rounded-xl shadow-md p-4 max-w-3xl w-full">
       {/* Imagen */}
@@ -27,18 +27,18 @@ const CardProvider = ({ id, name, imageUrl, tags, description }: CardProviderPro
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-2">
-          {tags.map((tag, idx) => (
+          {specialty.map((specialty, idx) => (
             <span
               key={idx}
               className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
             >
-              {tag}
+              {specialty}
             </span>
           ))}
         </div>
 
         {/* Descripción */}
-        <p className="text-sm text-secondary mb-3">{description}</p>
+        <p className="text-sm text-secondary mb-3">{biography}</p>
 
         {/* Botón ver perfil */}
         <div className='flex justify-end'>
