@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext'; 
 
 interface CardProviderProps {
-  id: string; 
+  id: string;
   name: string;
   imageUrl: string;
   specialty: string[];

@@ -1,4 +1,3 @@
-// components/Providers.tsx
 'use client'
 
 import { useProviders } from '@/context/ProvidersContext';
@@ -43,7 +42,7 @@ function Providers() {
     return (
       <div className="flex flex-col items-center gap-6 px-4 py-10">
         <p className="text-red-500">Error: {error}</p>
-        <button 
+        <button
           onClick={refreshProviders}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
         >
@@ -57,7 +56,7 @@ function Providers() {
     return (
       <div className="flex flex-col items-center gap-6 px-4 py-10">
         <p>No hay profesionales disponibles</p>
-        <button 
+        <button
           onClick={refreshProviders}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
         >
@@ -84,3 +83,4 @@ function Providers() {
 }
 
 export default Providers;
+
