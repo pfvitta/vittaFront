@@ -1,5 +1,5 @@
 export const createPayPalOrder = async (): Promise<string> => {
-    const res = await fetch('http://localhost:3001/paypal/create-order', {
+    const res = await fetch('http://localhost:4000/paypal/create-order', {
       method: 'POST',
     });
   
