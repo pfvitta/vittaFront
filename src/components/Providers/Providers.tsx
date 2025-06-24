@@ -13,7 +13,7 @@ function Providers() {
       const savedProviders = localStorage.getItem('providersData');
       if (savedProviders) {
         try {
-          const parsed = JSON.parse(savedProviders);
+          JSON.parse(savedProviders);
           // Validación opcional de datos aquí
         } catch (e) {
           console.error('Error parsing localStorage data', e);
@@ -73,9 +73,9 @@ function Providers() {
           key={provider.id}
           id={provider.id}
           name={provider.name}
-          imageUrl={provider.avatarUrl}
-          specialty={provider.specialty.name || []}
-          biography={provider.biography}
+          imageUrl={provider.avatarUrl || ''}
+          specialty={provider.specialty?.name || []}
+          biography={provider.biography || ''}
         />
       ))}
     </div>
