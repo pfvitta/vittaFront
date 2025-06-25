@@ -13,7 +13,7 @@ function Providers() {
       const savedProviders = localStorage.getItem('providersData');
       if (savedProviders) {
         try {
-          const parsed = JSON.parse(savedProviders);
+          JSON.parse(savedProviders);
           // Validación opcional de datos aquí
         } catch (e) {
           console.error('Error parsing localStorage data', e);
@@ -68,16 +68,19 @@ function Providers() {
 
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-10">
-      {providers.map((provider) => (
-        <CardProvider
-          key={provider.id}
-          id={provider.id}
-          name={provider.name}
-          imageUrl={provider.avatarUrl}
-          specialty={provider.specialty || []}
-          biography={provider.professionalProfile.biography}
-        />
-      ))}
+      {providers
+  .filter((provider) => provider.name !== 'Argenis Biscardi')
+  .map((provider) => (
+    <CardProvider
+      key={provider.id}
+      id={provider.id}
+      name={provider.name}
+      imageUrl={provider.avatarUrl || '/Avatar.jpg'}
+      specialty={provider.specialty || []}
+      biography={provider.professionalProfile?.biography || ''}
+    />
+))}
+
     </div>
   );
 }

@@ -23,7 +23,7 @@ const Memberships = () => {
 
       const data = await res.json();
       if (data.url) {
-        window.location.href = data.url; // redirige a la URL de aprobación
+        window.location.href = data.url;
       } else {
         throw new Error('No se encontró URL de aprobación');
       }
@@ -36,10 +36,10 @@ const Memberships = () => {
   };
 
   return (
-    <div className="p-5">
-      <div className="md:col-span-1 bg-gray-100 max-w-xl border border-secondary rounded-lg shadow-sm">
-        <div className="p-6 text-center justify-center">
-          <div className="text-center mb-4">
+    <div className="min-h-screen flex items-center justify-center p-5">
+      <div className="bg-gray-100 max-w-xl w-full border border-secondary rounded-lg shadow-sm">
+        <div className="p-6 text-center">
+          <div className="mb-4">
             <div className="flex justify-center mb-3">
               <CreditCard className="h-8 w-8 text-secondary" />
             </div>
@@ -47,13 +47,13 @@ const Memberships = () => {
             <p className="text-secondary font-semibold text-lg">¡Accede a un plan!</p>
           </div>
 
-          <div className="space-y-3 text-center mb-6">
+          <div className="space-y-3 mb-6">
             <p className="text-sm text-secondary">- Accede a dos sesiones al mes</p>
             <p className="text-sm text-secondary">- Un plan nutricional personalizado</p>
             <p className="text-sm text-secondary">- Información para un seguimiento seguro en tu salud</p>
           </div>
 
-          <div className="text-center mb-6">
+          <div className="mb-6">
             <p className="text-2xl font-bold text-primary">$50.000</p>
             <p className="text-sm text-primary">c/mes</p>
           </div>
@@ -76,3 +76,4 @@ const Memberships = () => {
 };
 
 export default Memberships;
+
