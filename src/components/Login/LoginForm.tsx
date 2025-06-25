@@ -46,8 +46,13 @@ export default function Login() {
       // ✅ Usamos la función login del contexto
       login(user, token, role);
 
-      // ✅ Navegamos al dashboard
-      router.push('/dashboard/user');
+      // ✅ Navegamos al dashboard correspondiente
+if (role === 'provider') {
+  router.push('/dashboard/provider');
+} else {
+  router.push('/dashboard/user');
+}
+
 
     } catch (error) {
       const err = error as Error;
@@ -122,7 +127,7 @@ export default function Login() {
         <div>
           <p className="mt-4 text-sm text-gray-600 text-center">
             ¿No tienes una cuenta?{' '}
-            <a href="/register/user" className="text-teal-700 hover:underline">
+            <a href="http://localhost:4000/auth/login" className="text-teal-700 hover:underline">
               Regístrate aquí
             </a>
           </p>

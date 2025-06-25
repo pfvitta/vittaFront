@@ -1,59 +1,36 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { LogOut, User, Mail, MapPin, Phone, Calendar, CreditCard, Briefcase, Award, FileText } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-
-interface ProfessionalProfile {
-  id: string;
-  biography: string;
-  verified: boolean;
-  verifiedBy: string | null;
-  experience: string;
-  licenseNumber: string;
-}
-
-interface ProviderData {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  dni: string;
-  city: string;
-  dob: string;
-  status: string;
-  createAt: string;
-  role: string;
-  membership: null;
-  professionalProfile: ProfessionalProfile;
-  avatarUrl?: string;
-  specialty?: string[];
-}
+import { useEffect } from "react";
+import { LogOut, User, Mail, MapPin, Phone, Calendar, CreditCard, Briefcase, Award, FileText } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardProvider() {
-  const [provider, setProvider] = useState<ProviderData | null>(null)
+  const { user, role, isAuthenticated } = useAuth();
+  const provider = role === "provider" ? user : null;
+
+  useEffect(() => {
+    if (!isAuthenticated || role !== "provider") {
+      window.location.href = "/login";
+    }
+  }, [isAuthenticated, role]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("user");
+    localStorage.removeItem("role");
     window.location.href = "/login";
-  }
+  };
 
-  useEffect(() => {
-    try {
-      const storedProvider = localStorage.getItem("user");
-      if (storedProvider && storedProvider !== "undefined") {
-        const parsed = JSON.parse(storedProvider);
-        console.log("Profesional desde localStorage:", parsed);
-        setProvider(parsed);
-      }
-    } catch (error) {
-      console.error("Error al obtener el profesional de localStorage:", error);
-      setProvider(null);
-    }
-  }, []);
+  if (!provider) {
+    return (
+      <div className="text-center py-10 text-gray-500">
+        Redirigiendo...
+      </div>
+    );
+  }
 
   return (
     <div className="flex p-5">
@@ -61,7 +38,7 @@ export default function DashboardProvider() {
       <aside className="bg-gray-100 m-1 rounded-xl border-gray-200 min-h-screen">
         <div className="p-4">
           <nav className="space-y-2">
-            <Link href="/dashboard">
+            <Link href="/dashboard-provider">
               <button className="btn-dashboard">
                 <User className="mr-3 h-4 w-4" />
                 Mi perfil
@@ -88,7 +65,7 @@ export default function DashboardProvider() {
       <main className="flex-2 p-1">
         <div className="max-w-5xl bg-gray-100 rounded-xl p-9 mx-auto">
           <div className="mb-8">
-            <h1 className="title1">Bienvenida/o {provider?.name || "Profesional"}!</h1>
+            <h1 className="title1">Bienvenida/o {provider.name}!</h1>
             <p className="text-gray-500 text-center">
               Gestiona tu información profesional y configuración de cuenta
             </p>
@@ -100,16 +77,16 @@ export default function DashboardProvider() {
               <div className="p-10 text-center">
                 <div className="flex justify-center mb-4">
                   <Image
-                    src={provider?.avatarUrl || "/Avatar.jpg"}
+                    src={provider.avatarUrl || "/Avatar.jpg"}
                     alt="Foto de perfil"
                     width={150}
                     height={150}
                     className="w-24 h-24 rounded-full object-cover"
                   />
                 </div>
-                <h2 className="title2">{provider?.name || "Sin nombre"}</h2>
+                <h2 className="title2">{provider.name}</h2>
                 <p className="text-gray-500 text-sm mb-4">
-                  {provider?.professionalProfile?.verified
+                  {provider.professionalProfile?.verified
                     ? "Profesional verificado"
                     : "Profesional no verificado"}
                 </p>
@@ -128,12 +105,9 @@ export default function DashboardProvider() {
                         const reader = new FileReader();
                         reader.onloadend = () => {
                           const base64 = reader.result as string;
-                          setProvider((prev) => {
-                            if (!prev) return prev;
-                            const updated = { ...prev, avatarUrl: base64 };
-                            localStorage.setItem("user", JSON.stringify(updated));
-                            return updated;
-                          });
+                          const updated = { ...provider, avatarUrl: base64 };
+                          localStorage.setItem("user", JSON.stringify(updated));
+                          window.location.reload();
                         };
                         reader.readAsDataURL(file);
                       }
@@ -154,14 +128,14 @@ export default function DashboardProvider() {
                 </div>
                 <div className="space-y-6">
                   <div className="grid gap-4 md:grid-cols-2">
-                    <InfoItem icon={<User className="h-5 w-5 text-secondary" />} label="Nombre completo" value={provider?.name} />
-                    <InfoItem icon={<Mail className="h-5 w-5 text-secondary" />} label="Correo electrónico" value={provider?.email} />
-                    <InfoItem icon={<MapPin className="h-5 w-5 text-secondary" />} label="Ciudad" value={provider?.city} />
-                    <InfoItem icon={<Phone className="h-5 w-5 text-secondary" />} label="Teléfono" value={provider?.phone} />
-                    <InfoItem icon={<Calendar className="h-5 w-5 text-secondary" />} label="Fecha de nacimiento" value={provider?.dob} />
-                    <InfoItem icon={<CreditCard className="h-5 w-5 text-secondary" />} label="DNI" value={provider?.dni} />
-                    <InfoItem icon={<Award className="h-5 w-5 text-secondary" />} label="Experiencia" value={provider?.professionalProfile?.experience} />
-                    <InfoItem icon={<FileText className="h-5 w-5 text-secondary" />} label="Matrícula" value={provider?.professionalProfile?.licenseNumber} />
+                    <InfoItem icon={<User className="h-5 w-5 text-secondary" />} label="Nombre completo" value={provider.name} />
+                    <InfoItem icon={<Mail className="h-5 w-5 text-secondary" />} label="Correo electrónico" value={provider.email} />
+                    <InfoItem icon={<MapPin className="h-5 w-5 text-secondary" />} label="Ciudad" value={provider.city} />
+                    <InfoItem icon={<Phone className="h-5 w-5 text-secondary" />} label="Teléfono" value={provider.phone} />
+                    <InfoItem icon={<Calendar className="h-5 w-5 text-secondary" />} label="Fecha de nacimiento" value={provider.dob} />
+                    <InfoItem icon={<CreditCard className="h-5 w-5 text-secondary" />} label="DNI" value={provider.dni} />
+                    <InfoItem icon={<Award className="h-5 w-5 text-secondary" />} label="Experiencia" value={provider.professionalProfile?.experience} />
+                    <InfoItem icon={<FileText className="h-5 w-5 text-secondary" />} label="Matrícula" value={provider.professionalProfile?.licenseNumber} />
                   </div>
                 </div>
               </div>
@@ -172,7 +146,7 @@ export default function DashboardProvider() {
               <div className="p-6">
                 <h2 className="title2 text-center">Biografía</h2>
                 <p className="text-gray-500 text-sm mt-2">
-                  {provider?.professionalProfile?.biography || "No hay biografía disponible"}
+                  {provider.professionalProfile?.biography || "No hay biografía disponible"}
                 </p>
               </div>
             </div>
@@ -187,7 +161,7 @@ export default function DashboardProvider() {
         </div>
       </main>
     </div>
-  )
+  );
 }
 
 function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value?: string }) {
@@ -201,5 +175,5 @@ function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string
         </div>
       </div>
     </div>
-  )
+  );
 }

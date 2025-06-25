@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ['s.gravatar.com', 'cdn.auth0.com'], // agrega los dominios que usas para imágenes
+  },/* config options here */
 };
 
 export default nextConfig;
