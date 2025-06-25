@@ -12,7 +12,7 @@ export const registerProvider = async (data: RegisterProviderValues) => {
     const errorData = await res.json();
     throw new Error(errorData.message || "Error al registrar proveedor");
     }
-  
+    console.log ("Provider registered successfully:", data);
     return await res.json();
   };
   
@@ -48,7 +48,7 @@ export const getProviders = async (): Promise<Provider[]> => {
       membership: provider.membership,
       professionalProfile: provider.professionalProfile,
       avatarUrl: provider.avatarUrl,
-      specialty: provider.specialty || [], // Asegura que specialty sea un array
+      specialty: provider.specialty || [], // Usa el array de especialidades del perfil profesional
       biography: provider.biography || provider.professionalProfile?.biography // Usa la biografía del perfil profesional
     }));
   } catch (err) {

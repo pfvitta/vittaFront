@@ -2,13 +2,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+interface Specialty {
+  id: string;
+  name: string;
+}
 interface CardProviderProps {
   id: string; 
   name: string;
   imageUrl: string;
-  specialty: string[];
+  specialty: Specialty[];
   biography: string;
 }
+
 
 const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
   return (
@@ -24,15 +29,29 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
           <h3 className="text-lg font-semibold text-secondary">{name}</h3>
           <div className="text-secondary text-xl">★★★★★</div>
         </div>
-
-        {/* Tags */}
+{/* 
+        Tags
         <div className="flex flex-wrap gap-2 mb-2">
-          {specialty.map((specialty, idx) => (
+          {specialty.map(item) => (
+          // {specialty.map((specialty, idx) => (
+
             <span
               key={idx}
               className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
             >
               {specialty}
+            </span>
+          ))}
+        </div> */}
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mb-2">
+          {specialty.map((item) => (
+            <span
+              key={item.id}
+              className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
+            >
+              {item.name}
             </span>
           ))}
         </div>
