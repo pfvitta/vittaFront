@@ -3,13 +3,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+interface Specialty {
+  id: string;
+  name: string;
+}
 interface CardProviderProps {
   id: string;
   name: string;
   imageUrl: string;
-  specialty: string[];
+  specialty: Specialty[];
   biography: string;
 }
+
 
 const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
   return (
@@ -29,6 +34,18 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
           {specialty.map((item, idx) => (
             <span key={idx} className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">
               {item}
+            </span>
+          ))}
+        </div> 
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mb-2">
+          {specialty.map((item) => (
+            <span
+              key={item.id}
+              className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
+            >
+              {item.name}
             </span>
           ))}
         </div>

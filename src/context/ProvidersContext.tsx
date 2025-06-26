@@ -4,6 +4,11 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { getProviders } from '../services/providerService';
 
 // Define las interfaces
+
+export interface Specialty {
+  id: string;
+  name: string;
+}
 export interface ProfessionalProfile {
   id: string;
   biography: string;
@@ -11,6 +16,7 @@ export interface ProfessionalProfile {
   verifiedBy: string | null;
   experience: string;
   licenseNumber: string;
+  specialty: Specialty[];
 }
 
 export interface Provider {
@@ -27,7 +33,7 @@ export interface Provider {
   membership: null | any;
   professionalProfile: ProfessionalProfile;
   avatarUrl?: string;
-  specialty?: string[]; // Añade specialty aquí
+  specialty?: Specialty[]; // Añade specialty aquí
   biography?: string; // Añade biography aquí para acceso directo
 }
 
@@ -58,9 +64,9 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
      
       const normalizedProviders = data.map(provider => ({
         ...provider,
-        specialty: provider.specialty || [], // Asegura que specialty sea un array
-        biography: provider.biography || provider.professionalProfile?.biography || "Descripción no disponible",
-        avatarUrl: provider.avatarUrl || "/default-profile.png"
+        specialty: provider.professionalProfile?.specialty || [], // ✅ Extrae del lugar correcto
+  biography: provider.professionalProfile?.biography || "Descripción no disponible",
+  avatarUrl: provider.avatarUrl || "/default-profile.png"
       }));
 
       setProviders(normalizedProviders);
