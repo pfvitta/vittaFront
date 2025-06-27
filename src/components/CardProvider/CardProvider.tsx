@@ -3,14 +3,21 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
+
+interface Specialty {
+  id: string;
+  name: string;
+}
 
 interface CardProviderProps {
   id: string;
   name: string;
   imageUrl: string;
-  specialty: string[];
+  specialty: Specialty[];
   biography: string;
 }
+
 
 const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
   const { isAuthenticated } = useAuth();
@@ -44,9 +51,9 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
         </div>
 
         <div className="flex flex-wrap gap-2 mb-2">
-          {specialty.map((item, idx) => (
-            <span key={idx} className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">
-              {item}
+          {specialty.map((item) => (
+            <span key={item.id} className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">
+              {item.name}
             </span>
           ))}
         </div>
@@ -54,12 +61,11 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
         <p className="text-sm text-secondary mb-3">{biography}</p>
 
         <div className="flex justify-end">
-          <button
-            onClick={handleProtectedClick}
-            className="text-sm px-4 py-2 rounded-full bg-primary text-white hover:bg-secondary transition"
-          >
-            Ver perfil
-          </button>
+          <Link onClick={handleProtectedClick} href={`/providers/${id}`}>
+            <button className="text-sm px-4 py-2 rounded-full bg-secondary text-white hover:bg-primary transition">
+              Ver perfil
+            </button>
+          </Link>
         </div>
       </div>
     </div>
