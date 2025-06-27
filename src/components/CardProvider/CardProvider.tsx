@@ -4,6 +4,8 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
+
 
 interface Specialty {
   id: string;
@@ -17,8 +19,8 @@ interface CardProviderProps {
   biography: string;
 }
 
-
 const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
+  
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
@@ -52,7 +54,7 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
         <div className="flex flex-wrap gap-2 mb-2">
           {specialty.map((item, idx) => (
             <span key={idx} className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">
-              {item}
+              {item.name}
             </span>
           ))}
         </div> 
@@ -72,12 +74,11 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
         <p className="text-sm text-secondary mb-3">{biography}</p>
 
         <div className="flex justify-end">
-          <button
-            onClick={handleProtectedClick}
-            className="text-sm px-4 py-2 rounded-full bg-primary text-white hover:bg-secondary transition"
-          >
-            Ver perfil
-          </button>
+          <Link href={`/providers/${id}`} onClick={handleProtectedClick}>
+            <button className="text-sm px-4 py-2 rounded-full bg-secondary text-white hover:bg-primary transition">
+              Ver perfil
+              </button>
+           </Link>
         </div>
       </div>
     </div>
