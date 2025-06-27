@@ -1,7 +1,9 @@
 'use client';
 
+
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 interface Specialty {
   id: string;
@@ -17,9 +19,26 @@ interface CardProviderProps {
 
 
 const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+
+  const handleProtectedClick = () => {
+    if (!id) {
+      alert("El ID del profesional no está disponible.");
+      return;
+    }
+
+    if (!isAuthenticated) {
+      alert("Debes iniciar sesión para ver el perfil del profesional.");
+      router.push('/login');
+      return;
+    }
+
+    router.push(`/providers/${id}`);
+  };
+
   return (
     <div className="flex bg-[#F8FBFE] rounded-xl shadow-md p-4 max-w-3xl w-full">
-      {/* Imagen */}
       <div className="w-24 h-24 relative rounded-lg overflow-hidden mr-4">
         <Image src={imageUrl} alt={name} fill className="object-cover" />
       </div>
@@ -52,13 +71,13 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
 
         <p className="text-sm text-secondary mb-3">{biography}</p>
 
-        {/* Botón ver perfil */}
-        <div className='flex justify-end'>
-        <Link href={`/providers/${id}`}>
-          <button className="text-sm px-4 py-2 rounded-full bg-primary text-white hover:bg-secondary transition">
+        <div className="flex justify-end">
+          <button
+            onClick={handleProtectedClick}
+            className="text-sm px-4 py-2 rounded-full bg-primary text-white hover:bg-secondary transition"
+          >
             Ver perfil
           </button>
-        </Link>
         </div>
       </div>
     </div>
@@ -66,5 +85,8 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
 };
 
 export default CardProvider;
+
+
+
 
 
