@@ -1,9 +1,9 @@
 'use client';
 
-
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext'; 
 
 interface Specialty {
   id: string;
@@ -16,7 +16,6 @@ interface CardProviderProps {
   specialty: Specialty[];
   biography: string;
 }
-
 
 const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
   const { isAuthenticated } = useAuth();
@@ -38,31 +37,25 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
   };
 
   return (
-    <div className="flex bg-[#F8FBFE] rounded-xl shadow-md p-4 max-w-3xl w-full">
-      <div className="w-24 h-24 relative rounded-lg overflow-hidden mr-4">
+    
+      <div className="flex bg-gray-100 rounded-xl shadow-md p-4 max-w-3xl w-full">
+      {/* Imagen */}
+      <div className="w-36 h-36 relative rounded-lg border border-primary overflow-hidden mr-4">
         <Image src={imageUrl} alt={name} fill className="object-cover" />
       </div>
-
+    
       <div className="flex-1">
         <div className="flex justify-between items-start mb-1">
-          <h3 className="text-lg font-semibold text-secondary">{name}</h3>
-          <div className="text-secondary text-xl">★★★★★</div>
+          <h3 className="text-2xl font-bold text-secondary mb-1">{name}</h3>
+          <div className="text-primary text-2xl">★★★★★</div>
         </div>
-
-        <div className="flex flex-wrap gap-2 mb-2">
-          {specialty.map((item, idx) => (
-            <span key={idx} className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full">
-              {item.name}
-            </span>
-          ))}
-        </div> 
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-2">
           {specialty.map((item) => (
             <span
               key={item.id}
-              className="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full"
+              className="border border-tertiary text-tertiary text-xs px-2 py-1 rounded-full"
             >
               {item.name}
             </span>
@@ -71,21 +64,18 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
 
         <p className="text-sm text-secondary mb-3">{biography}</p>
 
-        <div className="flex justify-end">
-          <button
-            onClick={handleProtectedClick}
-            className="text-sm px-4 py-2 rounded-full bg-primary text-white hover:bg-secondary transition"
-          >
-            Ver perfil
-          </button>
+        {/* Botón ver perfil */}
+        <div className='flex justify-end'>
+          <Link href={`/providers/${id}`} onClick={handleProtectedClick}>
+            <button className="text-sm px-4 py-2 rounded-full bg-secondary text-white hover:bg-primary transition">
+              Ver perfil
+            </button>
+          </Link>
         </div>
       </div>
     </div>
+    
   );
 };
 
 export default CardProvider;
-
-
-
-
