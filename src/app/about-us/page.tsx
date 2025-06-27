@@ -1,8 +1,10 @@
 'use client';
 
+
 import Image from 'next/image';
 
 export default function AboutUs() {
+  
   return (
     <main className="max-w-5xl mx-auto px-6 py-12 font-sans">
       <h1 className="text-4xl font-bold text-primary mb-6 text-center">Acerca de nosotros</h1>
@@ -32,7 +34,7 @@ export default function AboutUs() {
           </p>
         </div>
       </div>
-
     </main>
+    
   );
 }

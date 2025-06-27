@@ -65,8 +65,8 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
       const normalizedProviders = data.map(provider => ({
         ...provider,
         specialty: provider.professionalProfile?.specialty || [], // ✅ Extrae del lugar correcto
-  biography: provider.professionalProfile?.biography || "Descripción no disponible",
-  avatarUrl: provider.avatarUrl || "/default-profile.png"
+        biography: provider.professionalProfile?.biography || "Descripción no disponible",
+        avatarUrl: provider.avatarUrl || "/default-profile.png"
       }));
 
       setProviders(normalizedProviders);
