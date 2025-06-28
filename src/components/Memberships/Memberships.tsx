@@ -65,9 +65,19 @@ const Memberships = () => {
               loading ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >
-            {loading ? 'Redirigiendo...' : 'Acceder ahora'}
+            {loading ? 'Redirigiendo...' : 'Pagar con PayPal'}
           </button>
-
+          
+          <button
+            onClick={handlePay}
+            disabled={loading}
+            className={`bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary transition ${
+              loading ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
+          >
+            {loading ? 'Redirigiendo...' : 'Pagar con otro'}
+          </button>
+          
           {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
         </div>
       </div>

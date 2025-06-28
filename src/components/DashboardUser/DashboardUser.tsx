@@ -182,9 +182,11 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
                 <p className="text-gray-500 text-sm mt-2 mb-4">Dos sesiones al mes</p>
                 <p className="text-gray-500 text-sm mb-4">Plan nutricional personalizado</p>
                 <p className="text-gray-500 text-sm mb-4">Seguimiento seguro de tu salud</p>
-                <button className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">
+                <Link href="/memberships">
+                    <button className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">
                   Acceder ahora
                 </button>
+                </Link>
               </div>
             </div>
           </div>

@@ -63,7 +63,7 @@ export default function Home() {
               alt="Consulta virtual"
               width={300}
               height={300}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover" 
               priority
             />
           </div>
