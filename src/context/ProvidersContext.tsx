@@ -3,12 +3,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { getProviders } from '../services/providerService';
 
-// Define las interfaces
-
 export interface Specialty {
   id: string;
   name: string;
 }
+
 export interface ProfessionalProfile {
   id: string;
   biography: string;

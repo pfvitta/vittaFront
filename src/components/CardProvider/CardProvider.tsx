@@ -17,6 +17,7 @@ interface CardProviderProps {
   biography: string;
 }
 
+
 const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
