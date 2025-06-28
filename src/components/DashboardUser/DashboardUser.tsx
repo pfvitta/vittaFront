@@ -14,10 +14,12 @@ import {
 import Image from 'next/image';
 import React, { useEffect, useState, ReactNode } from 'react';
 import Link from 'next/link';
+import { handleImageUpload } from "../../services/uploadImageService";
 
 
 export default function DashboardUser() {
   type UserData = {
+    id: string;
     name: string;
     email: string;
     city: string;
@@ -26,6 +28,7 @@ export default function DashboardUser() {
     dob: string;
     avatarUrl?: string;
   };
+  
 
   const [user, setUser] = useState<UserData | null>(null);
 
@@ -57,7 +60,27 @@ export default function DashboardUser() {
   fetchUser();
 }, [])
   
-  
+
+const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  try {
+    if (!user?.id) {
+      throw new Error("User ID is undefined");
+    }
+    const imageUrl = await handleImageUpload(file, user.id); // Asegúrate de tener el `userId` disponible
+    console.log("Imagen subida con éxito:", imageUrl);
+    setUser((prev) => ({
+      ...prev!,
+      avatarUrl: imageUrl, // Actualiza el estado con la nueva URL
+    }));
+    // Guarda la URL en el estado o en el perfil si es necesario
+  } catch (error) {
+    console.error("Error al subir la imagen:", error);
+  }
+};
+
 
   return (
     <div className="flex p-5">
@@ -104,12 +127,13 @@ export default function DashboardUser() {
               <div className="p-10 text-center">
                 <div className="flex justify-center mb-4">
                 <Image
-                   src={user?.avatarUrl || "/Avatar.jpg"}
-                   alt="Foto de perfil"
-                   width={150}
-                   height={150}
-                   className="w-24 h-24 rounded-full object-cover"
+                 src={user?.avatarUrl || "/Avatar.jpg"}
+                 alt="Foto de perfil"
+                 width={150}
+                 height={150}
+                 className="w-24 h-24 rounded-full object-cover"
                 />
+
                 </div>
                 <h2 className="title2">{user?.name || "Sin nombre"}</h2>
                 <p className="text-gray-500 text-sm mb-4">Paciente activo</p>
@@ -122,21 +146,7 @@ export default function DashboardUser() {
                     type="file"
                     accept="image/*"
                     hidden
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          const base64 = reader.result as string;
-                          setUser((prev) => {
-                            const updated = { ...prev!, avatarUrl: base64 };
-                            localStorage.setItem("user", JSON.stringify(updated));
-                            return updated;
-                          });
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
+                    onChange={handleFileChange}
                   />
                 </label>
               </div>

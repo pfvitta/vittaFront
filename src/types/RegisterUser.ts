@@ -1,5 +1,5 @@
 export type RegisterUserValues = {
-  user: {
+  user: { 
     name: string;
     email: string;
     password: string;
