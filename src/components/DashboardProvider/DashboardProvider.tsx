@@ -5,10 +5,12 @@ import { LogOut, User, Mail, MapPin, Phone, Calendar, CreditCard, Briefcase, Awa
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { handleImageUpload } from "@/services/uploadImageService"  //from "@/services/upload"; // o donde tengas la función
 
 export default function DashboardProvider() {
   const { user, role, isAuthenticated } = useAuth();
   const provider = role === "provider" ? user : null;
+  const { setUser } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated || role !== "provider") {
@@ -93,15 +95,17 @@ export default function DashboardProvider() {
                 <button className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">
                   Editar Perfil
                 </button>
-                <label className="mt-3 inline-block cursor-pointer text-sm text-primary hover:underline">
+                {/* <label className="mt-3 inline-block cursor-pointer text-sm text-primary hover:underline">
                   Cambiar foto
                   <input
                     type="file"
                     accept="image/*"
                     hidden
-                    onChange={(e) => {
+                    // onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
-                      if (file) {
+                      // if (file) {
+                      if (file && provider.id) {
                         const reader = new FileReader();
                         reader.onloadend = () => {
                           const base64 = reader.result as string;
@@ -113,7 +117,36 @@ export default function DashboardProvider() {
                       }
                     }}
                   />
-                </label>
+                </label> */}
+
+
+            <label className="mt-3 inline-block cursor-pointer text-sm text-primary hover:underline">
+              Cambiar foto
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file && provider && "id" in provider) {
+                    try {
+                      const result = await handleImageUpload(file, provider.id);
+
+                      // Si el backend devuelve la nueva URL, actualiza localStorage y recarga
+                      if (result?.imgUrl) {
+                        const updated = { ...provider, avatarUrl: result.imgUrl };
+                        localStorage.setItem("user", JSON.stringify(updated));
+                        //window.location.reload();
+                        setUser(updated); // ✅ actualiza el contexto sin recargar
+                      }
+                    } catch (error) {
+                      alert("No se pudo subir la imagen. Verifica el formato o el tamaño.");
+                    }
+                  }
+                }}
+              />
+            </label>
+
               </div>
             </div>
 

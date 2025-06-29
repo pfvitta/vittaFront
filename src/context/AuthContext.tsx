@@ -4,6 +4,7 @@
 import { createContext, useEffect, useState, ReactNode, useContext } from 'react';
 
 type UserData = {
+    id: string;
     name: string;
     email: string;
     city: string;
@@ -28,6 +29,7 @@ type AuthContextType = {
   role: string;
   login: (user: UserData, token: string, role: string) => void;
   logout: () => void;
+  setUser: React.Dispatch<React.SetStateAction<UserData | null>>; // ← Texto añadido
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,7 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, role, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, role, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );
