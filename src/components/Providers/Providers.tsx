@@ -1,13 +1,14 @@
-'use client'
+'use client';
 
 import { useProviders } from '@/context/ProvidersContext';
-import CardProvider from "../CardProvider/CardProvider";
+import CardProvider from '@/components/CardProvider/CardProvider';
 import { useEffect, useState } from 'react';
 
 function Providers() {
   const { providers, loading, error, refreshProviders } = useProviders();
   const [hasHydrated, setHasHydrated] = useState(false);
 
+  // Solo para restaurar datos desde localStorage si hay error
   useEffect(() => {
     if (providers.length === 0 && !loading) {
       const savedProviders = localStorage.getItem('providersData');
@@ -22,12 +23,6 @@ function Providers() {
       setHasHydrated(true);
     }
   }, [providers.length, loading]);
-
-  useEffect(() => {
-    if (providers.length > 0 && hasHydrated) {
-      localStorage.setItem('providersData', JSON.stringify(providers));
-    }
-  }, [providers, hasHydrated]);
 
   if (loading && !hasHydrated) {
     return (
@@ -67,22 +62,20 @@ function Providers() {
 
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-10">
-      <h1 className='title1'>Nuestros profesionales</h1>
-      {providers
-  .map((provider) => (
-    <CardProvider
-      key={provider.id}
-      id={provider.id}
-      name={provider.name}
-      imageUrl={provider.avatarUrl || '/Avatar.jpg'}
-      specialty={provider.specialty || []}
-      biography={provider.professionalProfile?.biography || ''}
-    />
-))}
-
+      <h1 className="title1">Nuestros profesionales</h1>
+      {providers.map((provider) => (
+        <CardProvider
+          key={provider.id}
+          id={provider.id}
+          name={provider.name}
+          avatarUrl={provider.avatarUrl || '/Avatar.jpg'}
+          professionalProfile={provider.professionalProfile}
+        />
+      ))}
     </div>
   );
 }
 
 export default Providers;
+
 

@@ -1,3 +1,4 @@
+// app/providers/[id]/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -5,21 +6,8 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaMapMarkerAlt, FaBirthdayCake, FaIdCard } from 'react-icons/fa';
-
-interface Provider {
-  id: string;
-  name: string;
-  dni: string;
-  dob: string;
-  city: string;
-  avatarUrl?: string;
-  professionalProfile: {
-    biography: string;
-    experience: string;
-    licenseNumber: string;
-  };
-  specialty: string[];
-}
+import { getProviderById } from '@/services/providerService';
+import { Provider } from '@/types/Provider';
 
 export default function ProviderProfile() {
   const params = useParams();
@@ -33,9 +21,7 @@ export default function ProviderProfile() {
 
     const fetchProvider = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/users/${id}`);
-        if (!res.ok) throw new Error('Error al cargar el perfil');
-        const data = await res.json();
+        const data = await getProviderById(id);
         setProvider(data);
       } catch (error) {
         console.error('Error al obtener el perfil del profesional:', error);
@@ -69,17 +55,17 @@ export default function ProviderProfile() {
               </h1>
 
               <div className="flex flex-wrap gap-2 mb-4">
-                {provider.specialty.map((esp, index) => (
+                {provider.professionalProfile.specialty.map((esp, index) => (
                   <span
                     key={index}
                     className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-full"
                   >
-                    {esp}
+                    {esp.name}
                   </span>
                 ))}
               </div>
 
-              <p className="text-gray-600 text-sm mb-4">{provider.professionalProfile?.biography}</p>
+              <p className="text-gray-600 text-sm mb-4">{provider.professionalProfile.biography}</p>
 
               <div className="flex items-center text-green-500 gap-1 text-sm font-medium">
                 ★★★★★
@@ -98,7 +84,7 @@ export default function ProviderProfile() {
             <FaMapMarkerAlt /> {provider.city}
           </div>
           <div className="flex items-center gap-3 text-gray-700">
-            <FaIdCard /> Matrícula {provider.professionalProfile?.licenseNumber}
+            <FaIdCard /> Matrícula {provider.professionalProfile.licenseNumber}
           </div>
         </div>
       </div>

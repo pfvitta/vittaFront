@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
-import { useAuth } from '../../context/AuthContext'; // ✅ asegúrate que esta ruta esté correcta
+import { useAuth } from '../../context/AuthContext';
 
 type LoginFormValues = {
   email: string;
@@ -23,37 +23,26 @@ export default function Login() {
   const router = useRouter();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormValues>({ mode: 'onChange' });
   const [serverError, setServerError] = useState<string | null>(null);
-  const { login } = useAuth(); // ✅ traemos la función desde el contexto
+  const { login } = useAuth();
 
   const onSubmit = async (data: LoginFormValues) => {
     setServerError(null);
     try {
-      const response = await loginUser(data); // 👈 te devuelve { token }
-
+      const response = await loginUser(data);
       const { token } = response;
       if (!token) throw new Error("Falta token en la respuesta del login");
 
-      // ✅ Decodificamos el token
+      localStorage.setItem('token', token);
+
       const decoded = jwtDecode<TokenPayload>(token);
       const userId = decoded.sub;
-      const role = decoded.role || 'user';
-
+      const role = (decoded.role || 'user').toLowerCase() as 'user' | 'provider';
       if (!userId) throw new Error("El token no contiene userId");
 
-      // ✅ Obtenemos la información del usuario
-      const user = await getUserById(userId, token);
+      const user = await getUserById(userId);
+      login(user, role);
 
-      // ✅ Usamos la función login del contexto
-      login(user, token, role);
-
-      // ✅ Navegamos al dashboard correspondiente
-if (role === 'provider') {
-  router.push('/dashboard/provider');
-} else {
-  router.push('/dashboard/user');
-}
-
-
+      router.push(role === 'provider' ? '/dashboard/provider' : '/dashboard/user');
     } catch (error) {
       const err = error as Error;
       console.error("Login error:", err.message);
@@ -115,7 +104,7 @@ if (role === 'provider') {
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center">
-                <svg className="animate-spin h-5 w-5 mr-3 ..." viewBox="0 0 24 24"></svg>
+                <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"></svg>
                 Procesando...
               </span>
             ) : (
@@ -124,14 +113,21 @@ if (role === 'provider') {
           </button>
         </form>
 
-        <div>
-          <p className="mt-4 text-sm text-gray-600 text-center">
-            ¿No tienes una cuenta?{' '}
-            <a href="http://localhost:4000/auth/login" className="text-teal-700 hover:underline">
-              Regístrate aquí
-            </a>
-          </p>
-        </div>
+        <div className="mt-4 text-center">
+        <button
+  onClick={() => {
+    const currentPath = window.location.pathname + window.location.search;
+    localStorage.setItem('returnTo', currentPath);
+    const googleLoginUrl = `http://localhost:4000/auth/login?callbackUrl=${encodeURIComponent(currentPath)}`;
+    window.location.href = googleLoginUrl;
+  }}
+  className="flex items-center justify-center gap-3 w-full border border-gray-300 py-2 rounded-md hover:bg-gray-50 transition"
+>
+  <Image src="/google-logo.svg" alt="Google logo" width={20} height={20} />
+  <span className="text-sm text-gray-700 font-medium">Continuar con Google</span>
+</button>
+</div>
+
 
         <div className="mt-4 text-center">
           <a href="#" className="text-pink-800 hover:underline">
@@ -149,6 +145,9 @@ if (role === 'provider') {
     </div>
   );
 }
+
+
+
 
 
 

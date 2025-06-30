@@ -1,40 +1,15 @@
-'use client'
+// context/ProvidersContext.tsx
+'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { getProviders } from '../services/providerService';
-
-export interface Specialty {
-  id: string;
-  name: string;
-}
-
-export interface ProfessionalProfile {
-  id: string;
-  biography: string;
-  verified: boolean;
-  verifiedBy: string | null;
-  experience: string;
-  licenseNumber: string;
-  specialty: Specialty[];
-}
-
-export interface Provider {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  dni: string;
-  city: string;
-  dob: string;
-  status: string;
-  createdAt: string;
-  role: string;
-  membership: null | any;
-  professionalProfile: ProfessionalProfile;
-  avatarUrl?: string;
-  specialty?: Specialty[]; // Añade specialty aquí
-  biography?: string; // Añade biography aquí para acceso directo
-}
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from 'react';
+import { getProviders } from '@/services/providerService';
+import { Provider } from '@/types/Provider';
 
 interface ProvidersContextType {
   providers: Provider[];
@@ -50,7 +25,7 @@ const ProvidersContext = createContext<ProvidersContextType>({
   refreshProviders: () => {},
 });
 
-export const ProvidersProvider = ({ children }: { children: React.ReactNode }) => {
+export const ProvidersProvider = ({ children }: { children: ReactNode }) => {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,12 +35,10 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
     setError(null);
     try {
       const data = await getProviders();
-     
-      const normalizedProviders = data.map(provider => ({
+
+      const normalizedProviders: Provider[] = data.map((provider: Provider) => ({
         ...provider,
-        specialty: provider.professionalProfile?.specialty || [], // ✅ Extrae del lugar correcto
-        biography: provider.professionalProfile?.biography || "Descripción no disponible",
-        avatarUrl: provider.avatarUrl || "/default-profile.png"
+        avatarUrl: provider.avatarUrl || "/default-profile.png",
       }));
 
       setProviders(normalizedProviders);
@@ -73,7 +46,7 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error fetching providers:', err);
-     
+
       const savedProviders = localStorage.getItem('providersData');
       if (savedProviders) {
         try {
@@ -98,7 +71,7 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
         providers,
         loading,
         error,
-        refreshProviders: fetchProviders
+        refreshProviders: fetchProviders,
       }}
     >
       {children}

@@ -15,98 +15,71 @@ import Image from 'next/image';
 import React, { useEffect, useState, ReactNode } from 'react';
 import Link from 'next/link';
 import { handleImageUpload } from "../../services/uploadImageService";
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 
 export default function DashboardUser() {
-  type UserData = {
-    id: string;
-    name: string;
-    email: string;
-    city: string;
-    phone: string;
-    dni: string;
-    dob: string;
-    avatarUrl?: string;
-  };
-  
-
-  const [user, setUser] = useState<UserData | null>(null);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("user");
-    window.location.href = "http://localhost:4000/auth/logout"; // o usa router.push si prefieres
-  };
-  
+  const { user, isAuthenticated, role, logout } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-  const fetchUser = async () => {
+    if (!isAuthenticated || role !== 'user') {
+      router.push('/login');
+    }
+  }, [isAuthenticated, role, router]);
+
+  const currentUser = role === "user" ? user : null;
+  const [avatarUrl, setAvatarUrl] = useState(currentUser?.avatarUrl || "");
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentUser?.id) return;
+
     try {
-      const res = await fetch('http://localhost:4000/auth/me', {
-        credentials: 'include', // 👈 NECESARIO para enviar la cookie de sesión
-      });
-
-      if (!res.ok) throw new Error('No autorizado');
-
-      const data = await res.json();
-      localStorage.setItem('user', JSON.stringify(data));
-      setUser(data);
+      const uploadedUrl = await handleImageUpload(file, currentUser.id);
+      setAvatarUrl(uploadedUrl);
     } catch (error) {
-      console.error('Error cargando la sesión:', error);
+      console.error("Error al subir la imagen:", error);
     }
   };
 
-  fetchUser();
-}, [])
-  
+  const handleLogout = () => {
+  logout(); // limpia estado global
 
-const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+  if (role === 'user') {
+    const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN!;
+    const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID!;
+    const returnTo = process.env.NEXT_PUBLIC_AUTH0_LOGOUT_REDIRECT ?? "http://localhost:3000";
 
-  try {
-    if (!user?.id) {
-      throw new Error("User ID is undefined");
-    }
-    const imageUrl = await handleImageUpload(file, user.id); // Asegúrate de tener el `userId` disponible
-    console.log("Imagen subida con éxito:", imageUrl);
-    setUser((prev) => ({
-      ...prev!,
-      avatarUrl: imageUrl, // Actualiza el estado con la nueva URL
-    }));
-    // Guarda la URL en el estado o en el perfil si es necesario
-  } catch (error) {
-    console.error("Error al subir la imagen:", error);
+    window.location.href = `https://${domain}/v2/logout?client_id=${clientId}&returnTo=${encodeURIComponent(returnTo)}`;
+  } else {
+    router.push("/login");
   }
 };
 
 
   return (
     <div className="flex p-5">
-      {/* Sidebar */}
       <aside className="bg-gray-100 m-1 rounded-xl border-gray-200 min-h-screen">
         <div className="p-4">
           <nav className="space-y-2">
             <Link href="/dashboard">
               <button className="btn-dashboard">
-                <User className="mr-3 h-4 w-4" />
-                Mi perfil
+                <User className="mr-3 h-4 w-4" /> Mi perfil
               </button>
             </Link>
             <button className="btn-dashboard">
-              <History className="mr-3 h-4 w-4" />
-              Historial de turnos
+              <History className="mr-3 h-4 w-4" /> Historial de turnos
             </button>
             <button className="btn-dashboard">
-              <Utensils className="mr-3 h-4 w-4" />
-              Plan nutricional
+              <Utensils className="mr-3 h-4 w-4" /> Plan nutricional
             </button>
             <div className="border-t border-gray-200 my-4"></div>
             <button className="btn-dashboard" onClick={handleLogout}>
-              <LogOut className="mr-3 h-4 w-4" />
-              Cerrar sesión
-            </button>
+  <LogOut className="mr-3 h-4 w-4" /> Cerrar sesión
+</button>
+
           </nav>
         </div>
       </aside>
@@ -127,7 +100,7 @@ const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
               <div className="p-10 text-center">
                 <div className="flex justify-center mb-4">
                 <Image
-                 src={user?.avatarUrl || "/Avatar.jpg"}
+                 src={avatarUrl || "/Avatar.jpg"}
                  alt="Foto de perfil"
                  width={150}
                  height={150}

@@ -3,7 +3,7 @@ export const handleImageUpload = async (file: File, userId: string) => {
     formData.append('image', file);
   
     try {
-      const response = await fetch(`http://localhost:3001/files/uploadImage/${userId}`, {
+      const response = await fetch(`http://localhost:4000/files/uploadImage/${userId}`, {
         method: 'POST',
         body: formData,
       });

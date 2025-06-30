@@ -1,35 +1,38 @@
-"use client"
+"use client";
 
 import { useEffect } from "react";
-import { LogOut, User, Mail, MapPin, Phone, Calendar, CreditCard, Briefcase, Award, FileText } from "lucide-react";
+import {
+  LogOut,
+  User,
+  Mail,
+  MapPin,
+  Phone,
+  Calendar,
+  CreditCard,
+  Briefcase,
+  Award,
+  FileText,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { handleImageUpload } from "@/services/uploadImageService";
+import { Provider } from "@/types/Provider";
 
 export default function DashboardProvider() {
-  const { user, role, isAuthenticated } = useAuth();
-  const provider = role === "provider" ? user : null;
+  const { user, role, isAuthenticated, logout } = useAuth();
+  const router = useRouter();
+  const provider = role === "provider" ? (user as Provider) : null;
 
   useEffect(() => {
     if (!isAuthenticated || role !== "provider") {
-      window.location.href = "/login";
+      router.push("/login");
     }
-  }, [isAuthenticated, role]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-    window.location.href = "/login";
-  };
+  }, [isAuthenticated, role, router]);
 
   if (!provider) {
-    return (
-      <div className="text-center py-10 text-gray-500">
-        Redirigiendo...
-      </div>
-    );
+    return <div className="text-center py-10 text-gray-500">Redirigiendo...</div>;
   }
 
   return (
@@ -40,22 +43,18 @@ export default function DashboardProvider() {
           <nav className="space-y-2">
             <Link href="/dashboard-provider">
               <button className="btn-dashboard">
-                <User className="mr-3 h-4 w-4" />
-                Mi perfil
+                <User className="mr-3 h-4 w-4" /> Mi perfil
               </button>
             </Link>
             <button className="btn-dashboard">
-              <FileText className="mr-3 h-4 w-4" />
-              Mis turnos
+              <FileText className="mr-3 h-4 w-4" /> Mis turnos
             </button>
             <button className="btn-dashboard">
-              <Briefcase className="mr-3 h-4 w-4" />
-              Mis pacientes
+              <Briefcase className="mr-3 h-4 w-4" /> Mis pacientes
             </button>
             <div className="border-t border-gray-200 my-4"></div>
-            <button className="btn-dashboard" onClick={handleLogout}>
-              <LogOut className="mr-3 h-4 w-4" />
-              Cerrar sesión
+            <button className="btn-dashboard" onClick={logout}>
+              <LogOut className="mr-3 h-4 w-4" /> Cerrar sesión
             </button>
           </nav>
         </div>
@@ -99,17 +98,30 @@ export default function DashboardProvider() {
                     type="file"
                     accept="image/*"
                     hidden
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          const base64 = reader.result as string;
-                          const updated = { ...provider, avatarUrl: base64 };
-                          localStorage.setItem("user", JSON.stringify(updated));
-                          window.location.reload();
+                      if (!file) return;
+
+                      try {
+                        const imageUrl = await handleImageUpload(
+                          file,
+                          provider.id || ""
+                        );
+
+                        const updatedProvider = {
+                          ...provider,
+                          avatarUrl: imageUrl,
                         };
-                        reader.readAsDataURL(file);
+                        localStorage.setItem(
+                          "user",
+                          JSON.stringify({ provider: updatedProvider })
+                        );
+                        localStorage.setItem("role", "provider"); // opcional pero útil para seguridad
+
+                        // Refrescar página o actualizar estado según lo necesites
+                        window.location.reload();
+                      } catch (error) {
+                        console.error("Error al subir la imagen:", error);
                       }
                     }}
                   />
@@ -128,14 +140,46 @@ export default function DashboardProvider() {
                 </div>
                 <div className="space-y-6">
                   <div className="grid gap-4 md:grid-cols-2">
-                    <InfoItem icon={<User className="h-5 w-5 text-secondary" />} label="Nombre completo" value={provider.name} />
-                    <InfoItem icon={<Mail className="h-5 w-5 text-secondary" />} label="Correo electrónico" value={provider.email} />
-                    <InfoItem icon={<MapPin className="h-5 w-5 text-secondary" />} label="Ciudad" value={provider.city} />
-                    <InfoItem icon={<Phone className="h-5 w-5 text-secondary" />} label="Teléfono" value={provider.phone} />
-                    <InfoItem icon={<Calendar className="h-5 w-5 text-secondary" />} label="Fecha de nacimiento" value={provider.dob} />
-                    <InfoItem icon={<CreditCard className="h-5 w-5 text-secondary" />} label="DNI" value={provider.dni} />
-                    <InfoItem icon={<Award className="h-5 w-5 text-secondary" />} label="Experiencia" value={provider.professionalProfile?.experience} />
-                    <InfoItem icon={<FileText className="h-5 w-5 text-secondary" />} label="Matrícula" value={provider.professionalProfile?.licenseNumber} />
+                    <InfoItem
+                      icon={<User className="h-5 w-5 text-secondary" />}
+                      label="Nombre completo"
+                      value={provider.name}
+                    />
+                    <InfoItem
+                      icon={<Mail className="h-5 w-5 text-secondary" />}
+                      label="Correo electrónico"
+                      value={provider.email}
+                    />
+                    <InfoItem
+                      icon={<MapPin className="h-5 w-5 text-secondary" />}
+                      label="Ciudad"
+                      value={provider.city}
+                    />
+                    <InfoItem
+                      icon={<Phone className="h-5 w-5 text-secondary" />}
+                      label="Teléfono"
+                      value={provider.phone}
+                    />
+                    <InfoItem
+                      icon={<Calendar className="h-5 w-5 text-secondary" />}
+                      label="Fecha de nacimiento"
+                      value={provider.dob}
+                    />
+                    <InfoItem
+                      icon={<CreditCard className="h-5 w-5 text-secondary" />}
+                      label="DNI"
+                      value={provider.dni}
+                    />
+                    <InfoItem
+                      icon={<Award className="h-5 w-5 text-secondary" />}
+                      label="Experiencia"
+                      value={provider.professionalProfile?.experience}
+                    />
+                    <InfoItem
+                      icon={<FileText className="h-5 w-5 text-secondary" />}
+                      label="Matrícula"
+                      value={provider.professionalProfile?.licenseNumber}
+                    />
                   </div>
                 </div>
               </div>
@@ -146,7 +190,8 @@ export default function DashboardProvider() {
               <div className="p-6">
                 <h2 className="title2 text-center">Biografía</h2>
                 <p className="text-gray-500 text-sm mt-2">
-                  {provider.professionalProfile?.biography || "No hay biografía disponible"}
+                  {provider.professionalProfile?.biography ||
+                    "No hay biografía disponible"}
                 </p>
               </div>
             </div>
@@ -177,3 +222,4 @@ function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string
     </div>
   );
 }
+
