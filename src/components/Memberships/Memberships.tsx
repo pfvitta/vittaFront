@@ -2,19 +2,18 @@
 
 import { useState } from 'react';
 import { CreditCard } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
-
-// Cargar Stripe con la clave pública desde las variables de entorno
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+import { useAuth } from '@/context/AuthContext';
+import { initializeStripe, createStripePayment } from '@/services/stripeService';
 
 const Memberships = () => {
   const [loading, setLoading] = useState<'paypal' | 'stripe' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const handlePaypalPayment = async () => {
     setLoading('paypal');
     setError(null);
-    
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/paypal/create-order`, {
         method: 'POST',
@@ -23,21 +22,14 @@ const Memberships = () => {
         },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al crear orden de PayPal');
-      }
-
       const { url } = await response.json();
-      
-      if (!url) {
-        throw new Error('No se recibió URL de redirección de PayPal');
-      }
+      if (!url) throw new Error('No se recibió URL de redirección de PayPal');
 
       window.location.href = url;
     } catch (err) {
       console.error('Error en pago PayPal:', err);
       setError(err instanceof Error ? err.message : 'Error al procesar pago con PayPal');
+    } finally {
       setLoading(null);
     }
   };
@@ -47,43 +39,23 @@ const Memberships = () => {
     setError(null);
 
     try {
-      // 1. Inicializar Stripe
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error('No se pudo cargar Stripe');
+      if (!user?.email) throw new Error('Usuario no autenticado');
 
-      // 2. Crear la sesión de pago en el backend
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stripe/create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const stripe = await initializeStripe();
+      const { clientSecret } = await createStripePayment(user.email);
+
+      const { error: stripeError } = await stripe!.confirmPayment({
+        clientSecret,
+        confirmParams: {
+          return_url: `${window.location.origin}/success`,
         },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al crear orden de pago');
-      }
-
-      const { clientSecret } = await response.json();
-      
-      if (!clientSecret) {
-        throw new Error('No se recibió clientSecret de Stripe');
-      }
-
-      // 3. Confirmar el pago y redirigir
-      const { error: stripeError } = await stripe.confirmPayment({
-        clientSecret,
-        
-        confirmParams: {
-          return_url: `${window.location.origin}/success`, // Añadido dentro de confirmParams
-        }
-      });
-
       if (stripeError) throw stripeError;
-
     } catch (err) {
       console.error('Error en pago Stripe:', err);
       setError(err instanceof Error ? err.message : 'Error al procesar pago con Stripe');
+    } finally {
       setLoading(null);
     }
   };
@@ -121,7 +93,7 @@ const Memberships = () => {
             >
               {loading === 'paypal' ? 'Procesando...' : 'Pagar con PayPal'}
             </button>
-            
+
             <button
               onClick={handleStripePayment}
               disabled={loading === 'stripe'}
@@ -136,7 +108,7 @@ const Memberships = () => {
           {error && (
             <div className="mt-4 p-3 bg-red-50 rounded-lg">
               <p className="text-red-600 text-sm">{error}</p>
-              <button 
+              <button
                 onClick={() => setError(null)}
                 className="text-blue-500 text-xs mt-1 hover:underline"
               >
@@ -151,3 +123,5 @@ const Memberships = () => {
 };
 
 export default Memberships;
+
+
