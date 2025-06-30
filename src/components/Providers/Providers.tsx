@@ -68,21 +68,18 @@ function Providers() {
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-10">
       <h1 className='title1'>Nuestros profesionales</h1>
-      {providers
-  .map((provider) => (
-    <CardProvider
-      key={provider.id}
-      id={provider.id}
-      name={provider.name}
-      imageUrl={provider.avatarUrl || '/Avatar.jpg'}
-      specialty={provider.specialty || []}
-      biography={provider.professionalProfile?.biography || ''}
-    />
-))}
-
+      {providers.map((provider) => (
+        <CardProvider
+          key={provider.id}
+          id={provider.id}
+          name={provider.name}
+          imageUrl={provider.avatarUrl || '/Avatar.jpg'}
+          specialty={provider.specialty || []}
+          biography={provider.professionalProfile?.biography || ''}
+        />
+      ))}
     </div>
   );
 }
 
 export default Providers;
-

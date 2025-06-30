@@ -20,6 +20,12 @@ type UserData = {
       specialty: string[];
       verified: boolean;
     };
+    file?: {
+    id?: string;
+    filename?: string;
+    mimetype?: string;
+    imgUrl?: string;
+  };
   };
   
 

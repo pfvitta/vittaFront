@@ -79,7 +79,8 @@ export default function DashboardProvider() {
               <div className="p-10 text-center">
                 <div className="flex justify-center mb-4">
                   <Image
-                    src={provider.avatarUrl || "/Avatar.jpg"}
+                    // src={provider.avatarUrl || "/Avatar.jpg"}
+                    src={provider.file?.imgUrl || "/Avatar.jpg"}
                     alt="Foto de perfil"
                     width={150}
                     height={150}
@@ -95,30 +96,6 @@ export default function DashboardProvider() {
                 <button className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">
                   Editar Perfil
                 </button>
-                {/* <label className="mt-3 inline-block cursor-pointer text-sm text-primary hover:underline">
-                  Cambiar foto
-                  <input
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    // onChange={(e) => {
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      // if (file) {
-                      if (file && provider.id) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          const base64 = reader.result as string;
-                          const updated = { ...provider, avatarUrl: base64 };
-                          localStorage.setItem("user", JSON.stringify(updated));
-                          window.location.reload();
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                </label> */}
-
 
             <label className="mt-3 inline-block cursor-pointer text-sm text-primary hover:underline">
               Cambiar foto
@@ -132,13 +109,15 @@ export default function DashboardProvider() {
                     try {
                       const result = await handleImageUpload(file, provider.id);
 
-                      // Si el backend devuelve la nueva URL, actualiza localStorage y recarga
                       if (result?.imgUrl) {
-                        const updated = { ...provider, avatarUrl: result.imgUrl };
-                        localStorage.setItem("user", JSON.stringify(updated));
-                        //window.location.reload();
-                        setUser(updated); // ✅ actualiza el contexto sin recargar
+                        const updated = {
+                          ...provider,
+                          file: { ...(provider.file || {}), imgUrl: result.imgUrl }
+                        };
+                        setUser(updated); // actualiza el contexto
+                        localStorage.setItem("user", JSON.stringify(updated)); // actualiza el localStorage
                       }
+                      
                     } catch (error) {
                       alert("No se pudo subir la imagen. Verifica el formato o el tamaño.");
                     }
