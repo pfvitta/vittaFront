@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import { AuthProvider } from "@/context/AuthContext"; // 👈 importa el provider
 import { ProvidersProvider } from "@/context/ProvidersContext";
+import { Auth0Provider } from "@auth0/nextjs-auth0" // 👈 Importa el nuevo provider
 
 export const metadata: Metadata = {
   title: "Vitta",
@@ -21,18 +22,17 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="min-h-screen flex flex-col">
-        <ProvidersProvider>
-          <AuthProvider> 
-            <Navbar />
+        <Auth0Provider>
+          <ProvidersProvider>
+            <AuthProvider>
+              <Navbar />
               <main className="flex-grow">{children}</main>
-            <Footer />
-          </AuthProvider>
-        </ProvidersProvider>
-        
+              <Footer />
+            </AuthProvider>
+          </ProvidersProvider>
+        </Auth0Provider>
       </body>
     </html>
   );
 }
-
-
 

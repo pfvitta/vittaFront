@@ -10,8 +10,13 @@ import { useAuth } from "@/context/AuthContext";
 const Navbar = () => {
   const { isAuthenticated, logout, role } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isMounted, setIsMounted] = useState(false); // 👈 protección contra SSR
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true); // habilita el renderizado tras montar
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -25,8 +30,11 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    router.push("/login");
+    router.push("/auth/logout");
   };
+
+  // ⛔️ Evita hidratar contenido hasta que esté montado
+  if (!isMounted) return null;
 
   return (
     <header className="bg-white shadow-sm py-2">
@@ -56,24 +64,23 @@ const Navbar = () => {
         <div className="flex items-center space-x-2 relative">
           {!isAuthenticated ? (
             <>
-              <Link
-                href="/login"
-                className="text-secondary px-4 py-2 rounded-full text-bold text-sm hover:text-secondary transition"
-              >
-                Iniciar sesión
+              <Link href="/auth/login">
+                <button className="text-secondary px-4 py-2 rounded-full font-bold text-sm hover:text-secondary transition">
+                  Iniciar sesión
+                </button>
               </Link>
-              <Link href="/register/provider">
+
+              <Link href="/auth/login?userType=provider">
                 <button className="bg-tertiary border border-white text-secondary px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
                   Soy nutricionista
                 </button>
               </Link>
- 
-<Link href="http://localhost:4000/auth/login">
-  <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-    Empieza aquí
-  </button>
-</Link>
 
+              <Link href="/auth/login?userType=user">
+                <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                  Empieza aquí
+                </button>
+              </Link>
             </>
           ) : (
             <div className="relative" ref={dropdownRef}>
@@ -84,12 +91,12 @@ const Navbar = () => {
               {showDropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-md z-50">
                   <Link
-                    href={role === 'provider' ? "/dashboard/provider" : "/dashboard/user"}
+                    href={role === "provider" ? "/dashboard/provider" : "/dashboard/user"}
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     Mi perfil
                     <span className="block text-xs text-gray-400 mt-0.5">
-                      {role === 'provider' ? 'Profesional' : 'Usuario'}
+                      {role === "provider" ? "Profesional" : "Usuario"}
                     </span>
                   </Link>
                   <button
@@ -101,7 +108,7 @@ const Navbar = () => {
                 </div>
               )}
 
-              {role === 'user' && (
+              {role === "user" && (
                 <Link href="/memberships">
                   <button className="ml-3 bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
                     Acceder a membresía

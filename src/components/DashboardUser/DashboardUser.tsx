@@ -1,63 +1,114 @@
-"use client";
+'use client';
 
 import {
-  User,
-  History,
-  Utensils,
-  LogOut,
-  Mail,
-  MapPin,
-  Phone,
-  Calendar,
-  CreditCard,
+  User, History, Utensils, LogOut, Mail, MapPin,
+  Phone, Calendar, CreditCard,
 } from 'lucide-react';
 import Image from 'next/image';
-import React, { useEffect, useState, ReactNode } from 'react';
 import Link from 'next/link';
-
+import React, { ReactNode, useEffect, useState } from 'react';
+import { useUser } from '@auth0/nextjs-auth0';
+import { registerUser } from '@/services/userService';
+import { RegisterUserValues } from '@/types/RegisterUser';
+//import { getAccessToken } from '@/app/utils/getAccessToken';
 
 export default function DashboardUser() {
-  type UserData = {
-    name: string;
-    email: string;
-    city: string;
-    phone: string;
-    dni: string;
-    dob: string;
-    avatarUrl?: string;
-  };
+  const { user, error, isLoading } = useUser();
+  const [hasMounted, setHasMounted] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
 
-  const [user, setUser] = useState<UserData | null>(null);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("user");
-    window.location.href = "http://localhost:4000/auth/logout"; // o usa router.push si prefieres
-  };
-  
+  /**
+type UserData = {
+  name: string;
+  email: string;
+  city?: string;
+  phone?: string;
+  dni?: string;
+  dob?: string;
+  picture?: string;
+  avatarUrl?: string;
+}; */
 
   useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const res = await fetch('http://localhost:4000/auth/me', {
-        credentials: 'include', // 👈 NECESARIO para enviar la cookie de sesión
-      });
+    setHasMounted(true);
+  }, []);
 
-      if (!res.ok) throw new Error('No autorizado');
+  // 👉 Registrar automáticamente al usuario si aún no está registrado
+  useEffect(() => {
+    const autoRegister = async () => {
+      try {
+        if (user && !isRegistered) {
 
-      const data = await res.json();
-      localStorage.setItem('user', JSON.stringify(data));
-      setUser(data);
-    } catch (error) {
-      console.error('Error cargando la sesión:', error);
-    }
+          console.log('🧠 Usuario:', user);
+        console.log('🔐 Roles:', user?.role);
+
+
+           const roles = user?.role || [];
+        const mainRole = roles[0] || 'user';
+
+        // const accessToken = await getAccessToken(); // 👈 obtenemos el token
+
+          const userData: RegisterUserValues = {
+            user: {
+              name: user.name || "",
+              email: user.email || "",
+              password: "",
+              confirmPassword: "",
+              phone: "",
+              dni: "",
+              city: "",
+              dob: "",
+              role: mainRole,
+            },
+          };
+
+          await registerUser(userData);
+          setIsRegistered(true);
+        }
+      } catch (err) {
+        console.error('Error registrando usuario:', err);
+      }
+    };
+
+    autoRegister();
+  }, [user, isRegistered]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = '/auth/logout';
   };
 
-  fetchUser();
-}, [])
-  
-  
+  if (!hasMounted) return null;
+  if (isLoading) return <p>Cargando...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  //const [localUser, setLocalUser] = useState<UserData | null>(null);
+
+
+/**  useEffect(() => {
+
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('http://localhost:4000/auth/me', {
+          credentials: 'include',
+        });
+
+        if (!res.ok) throw new Error('No autorizado');
+
+        const data = await res.json();
+        localStorage.setItem('localUser', JSON.stringify(data));
+        setLocalUser(data);
+      } catch (error) {
+        console.error('Error cargando la sesión:', error);
+      }
+    };
+
+    fetchUser();
+  }, []); */
+
+ 
+  //const userData = localUser || (user as UserData | null);
+  //if (!userData) return <p>No estás autenticado</p>;
 
   return (
     <div className="flex p-5">
