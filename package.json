@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.7.0",
-    "auth0": "^4.26.0",
+    "@stripe/stripe-js": "^7.4.0",
+    "auth0": "^4.27.0",
     "framer-motion": "^12.17.0",
     "install": "^0.13.0",
     "jwt-decode": "^4.0.0",

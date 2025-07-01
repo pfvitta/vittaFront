@@ -1,20 +1,27 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { LogOut, User, Mail, MapPin, Phone, Calendar, CreditCard, Briefcase, Award, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { handleImageUpload } from "@/services/uploadImageService";
 
 export default function DashboardProvider() {
-  const { user, role, isAuthenticated } = useAuth();
+  const { user, role, isAuthenticated, setUser } = useAuth();
+  const [loading, setLoading] = useState(true);
   const provider = role === "provider" ? user : null;
 
   useEffect(() => {
-    if (!isAuthenticated || role !== "provider") {
+    const token = localStorage.getItem("token");
+    const savedRole = localStorage.getItem("role");
+
+    if (!token || savedRole !== "provider") {
       window.location.href = "/login";
+    } else {
+      setLoading(false);
     }
-  }, [isAuthenticated, role]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -23,6 +30,14 @@ export default function DashboardProvider() {
     localStorage.removeItem("role");
     window.location.href = "/login";
   };
+
+  if (loading) {
+    return (
+      <div className="text-center py-10 text-gray-500">
+        Cargando...
+      </div>
+    );
+  }
 
   if (!provider) {
     return (
@@ -38,7 +53,7 @@ export default function DashboardProvider() {
       <aside className="bg-gray-100 m-1 rounded-xl border-gray-200 min-h-screen">
         <div className="p-4">
           <nav className="space-y-2">
-            <Link href="/dashboard-provider">
+            <Link href="/dashboard/provider">
               <button className="btn-dashboard">
                 <User className="mr-3 h-4 w-4" />
                 Mi perfil
@@ -77,7 +92,7 @@ export default function DashboardProvider() {
               <div className="p-10 text-center">
                 <div className="flex justify-center mb-4">
                   <Image
-                    src={provider.avatarUrl || "/Avatar.jpg"}
+                    src={provider.file?.imgUrl || "/Avatar.jpg"}
                     alt="Foto de perfil"
                     width={150}
                     height={150}
@@ -93,23 +108,31 @@ export default function DashboardProvider() {
                 <button className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">
                   Editar Perfil
                 </button>
+
                 <label className="mt-3 inline-block cursor-pointer text-sm text-primary hover:underline">
                   Cambiar foto
                   <input
                     type="file"
                     accept="image/*"
                     hidden
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          const base64 = reader.result as string;
-                          const updated = { ...provider, avatarUrl: base64 };
-                          localStorage.setItem("user", JSON.stringify(updated));
-                          window.location.reload();
-                        };
-                        reader.readAsDataURL(file);
+                      if (file && provider && "id" in provider) {
+                        try {
+                          const result = await handleImageUpload(file, provider.id);
+
+                          if (result?.imgUrl) {
+                            const updated = {
+                              ...provider,
+                              file: { ...(provider.file || {}), imgUrl: result.imgUrl }
+                            };
+                            setUser(updated);
+                            localStorage.setItem("user", JSON.stringify(updated));
+                          }
+                          
+                        } catch (error) {
+                          alert("No se pudo subir la imagen. Verifica el formato o el tamaño.");
+                        }
                       }
                     }}
                   />

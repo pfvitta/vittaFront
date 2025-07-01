@@ -1,14 +1,22 @@
 import Hero from "@/components/Hero/Hero";
 import Image from 'next/image';
+<<<<<<< HEAD
 import { redirect } from "next/navigation";
 import { auth0 } from "@/lib/auth0";
+=======
+import { auth0 } from "@/lib/auth0";
+import {redirect} from "next/navigation"
+>>>>>>> c241c0df661ebc0051db767cc4f5c9ef6741bab1
 
 export default async function Home() {
 
   // Valida si hay una sesion activa 
    const session = await auth0.getSession();
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> c241c0df661ebc0051db767cc4f5c9ef6741bab1
    if (session) {
     redirect("/dashboard/user"); // Si no hay sesión, envía al home
   }

@@ -7,14 +7,16 @@ import { useEffect, useState } from 'react';
 function Providers() {
   const { providers, loading, error, refreshProviders } = useProviders();
   const [hasHydrated, setHasHydrated] = useState(false);
+  
+  // Filtramos solo los providers con rol 'provider'
+  const filteredProviders = providers.filter(provider => provider.role === 'provider');
 
   useEffect(() => {
-    if (providers.length === 0 && !loading) {
+    if (filteredProviders.length === 0 && !loading) {  // Cambiamos providers por filteredProviders
       const savedProviders = localStorage.getItem('providersData');
       if (savedProviders) {
         try {
           JSON.parse(savedProviders);
-          // Validación opcional de datos aquí
         } catch (e) {
           console.error('Error parsing localStorage data', e);
           localStorage.removeItem('providersData');
@@ -22,13 +24,13 @@ function Providers() {
       }
       setHasHydrated(true);
     }
-  }, [providers.length, loading]);
+  }, [filteredProviders.length, loading]);  // Cambiamos providers por filteredProviders
 
   useEffect(() => {
-    if (providers.length > 0 && hasHydrated) {
-      localStorage.setItem('providersData', JSON.stringify(providers));
+    if (filteredProviders.length > 0 && hasHydrated) {  // Cambiamos providers por filteredProviders
+      localStorage.setItem('providersData', JSON.stringify(filteredProviders));  // Guardamos los filtrados
     }
-  }, [providers, hasHydrated]);
+  }, [filteredProviders, hasHydrated]);  // Cambiamos providers por filteredProviders
 
   if (loading && !hasHydrated) {
     return (
@@ -52,7 +54,7 @@ function Providers() {
     );
   }
 
-  if (providers.length === 0) {
+  if (filteredProviders.length === 0) {  // Cambiamos providers por filteredProviders
     return (
       <div className="flex flex-col items-center gap-6 px-4 py-10">
         <p>No hay profesionales disponibles</p>
@@ -69,22 +71,18 @@ function Providers() {
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-10">
       <h1 className='title1'>Nuestros profesionales</h1>
-      {providers
-  .filter((provider) => provider.name !== 'Argenis Biscardi')
-  .map((provider) => (
-    <CardProvider
-      key={provider.id}
-      id={provider.id}
-      name={provider.name}
-      imageUrl={provider.avatarUrl || '/Avatar.jpg'}
-      specialty={provider.specialty || []}
-      biography={provider.professionalProfile?.biography || ''}
-    />
-))}
-
+      {filteredProviders.map((provider) => (  // Cambiamos providers por filteredProviders
+        <CardProvider
+          key={provider.id}
+          id={provider.id}
+          name={provider.name}
+          imageUrl={provider.avatarUrl || '/Avatar.jpg'}
+          specialty={provider.specialty || []}
+          biography={provider.professionalProfile?.biography || ''}
+        />
+      ))}
     </div>
   );
 }
 
 export default Providers;
-

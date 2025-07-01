@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { loginUser } from '@/services/authService';
 import { getUserById } from '@/services/userService';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
@@ -109,7 +110,7 @@ if (role === 'provider') {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`w-full bg-teal-700 text-white py-2 rounded-md hover:bg-teal-800 transition-colors ${
+            className={`w-full bg-primary text-white py-2 rounded-full hover:bg-teal-800 transition-colors ${
               isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >
@@ -122,20 +123,19 @@ if (role === 'provider') {
               'Iniciar sesión'
             )}
           </button>
+
+          
         </form>
 
-        <div>
-          <p className="mt-4 text-sm text-gray-600 text-center">
-            ¿No tienes una cuenta?{' '}
-            <a href="http://localhost:4000/auth/login" className="text-teal-700 hover:underline">
-              Regístrate aquí
-            </a>
-          </p>
-        </div>
+        <Link className="mt-4 block" href="/auth/login">
+            <button className="w-full text-secondary border border-secondary px-4 py-2 rounded-full text-sm hover:border-primary hover:text-primary transition">
+              Continuar con Google
+            </button>
+          </Link>
 
-        <div className="mt-4 text-center">
-          <a href="#" className="text-pink-800 hover:underline">
-            Reestablecer contraseña
+        <div className="mt-4 text-sm text-gray-600 text-center"> ¿Olvidaste tu contraseña? {' '}
+          <a href="#" className="text-gray-600 hover:underline">
+            Click aquí
           </a>
         </div>
         <p className="mt-6 text-center text-sm text-gray-500">
