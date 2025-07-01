@@ -29,7 +29,7 @@ export interface Provider {
   status: string;
   createdAt: string;
   role: string;
-  membership: null | any;
+  membership: "active" | "inactive";
   professionalProfile: ProfessionalProfile;
   avatarUrl?: string;
   specialty?: Specialty[]; // Añade specialty aquí
