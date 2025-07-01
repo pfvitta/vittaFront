@@ -7,11 +7,17 @@ import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
+
 const Navbar = () => {
-  const { isAuthenticated, logout, role } = useAuth();
+  const { isAuthenticated, logout, role, user } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [ isMounted, setIsMounted ] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -25,8 +31,10 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    router.push("/login");
+    router.push("/auth/logout");
   };
+
+  if (!isMounted) return null;
 
   return (
     <header className="bg-white shadow-sm py-2">
@@ -67,47 +75,53 @@ const Navbar = () => {
                   Soy nutricionista
                 </button>
               </Link>
- 
-<Link href="http://localhost:4000/auth/login">
-  <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-    Empieza aquí
-  </button>
-</Link>
-
+              <Link href="/auth/login?userType=user">
+                <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                  Empieza aquí
+                </button>
+              </Link>
             </>
           ) : (
-            <div className="relative" ref={dropdownRef}>
-              <button onClick={() => setShowDropdown((prev) => !prev)}>
-                <User className="w-6 h-6 text-secondary hover:text-primary" />
-              </button>
-
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-md z-50">
-                  <Link
-                    href={role === 'provider' ? "/dashboard/provider" : "/dashboard/user"}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Mi perfil
-                    <span className="block text-xs text-gray-400 mt-0.5">
-                      {role === 'provider' ? 'Profesional' : 'Usuario'}
-                    </span>
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                  >
-                    Cerrar sesión
-                  </button>
-                </div>
-              )}
-
+            <div className="flex items-center">
               {role === 'user' && (
-                <Link href="/memberships">
-                  <button className="ml-3 bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                <Link href="/memberships" className="mr-3">
+                  <button className="bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
                     Acceder a membresía
                   </button>
                 </Link>
               )}
+              
+              <div className="relative" ref={dropdownRef}>
+                <button 
+                  onClick={() => setShowDropdown((prev) => !prev)}
+                  className="flex items-center space-x-1"
+                >
+                  <User className="w-6 h-6 text-secondary hover:text-primary" />
+                  <span className="text-sm font-medium text-secondary hidden md:inline">
+                    {user?.name?.split(' ')[0] || 'Mi cuenta'}
+                  </span>
+                </button>
+
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-md z-50">
+                    <Link
+                      href={role === 'provider' ? "/dashboard/provider" : "/dashboard/user"}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Mi perfil
+                      <span className="block text-xs text-gray-400 mt-0.5">
+                        {role === 'provider' ? 'Profesional' : 'Usuario'}
+                      </span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -117,11 +131,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
-
-
-
-
-
-
-

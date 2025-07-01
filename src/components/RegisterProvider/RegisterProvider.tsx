@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { registerProvider } from "@/services/providerService";
-import { RegisterProviderValues } from "@/types/RegisterProviders";
+import { RegisterProviderValues } from "@/types/forms/RegisterProviders";
 import Image from "next/image";
 import { useState } from "react";
 import {useRouter} from 'next/navigation'

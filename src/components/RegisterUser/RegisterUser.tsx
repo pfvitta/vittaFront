@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { registerUser } from "@/services/userService";
-import { RegisterUserValues } from "@/types/RegisterUser";
+import { RegisterUserValues } from "@/types/forms/RegisterUser";
 import { useRouter } from "next/navigation";
 
 type FormInputs = {

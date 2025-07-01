@@ -49,15 +49,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const storedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     const storedRole = localStorage.getItem('role');
-
+    console.log(isAuthenticated, "se esta autenticando");
+    console.log(storedUser, token, storedRole, "storedUser, token, storedRole, ");
     if (storedUser && token && storedRole) {
       setUser(JSON.parse(storedUser));
       setIsAuthenticated(true);
       setRole(storedRole);
+      console.log(isAuthenticated, "se esta autenticando bien ");
     }
-  }, []);
+  }, [isAuthenticated]);
 
   const login = (user: UserData, token: string, role: string) => {
+    console.log('Guardando en localStorage:', { token});
     localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('token', token);
     localStorage.setItem('role', role);
