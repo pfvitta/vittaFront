@@ -2,8 +2,34 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['s.gravatar.com', 'cdn.auth0.com', 'res.cloudinary.com'], // agrega los dominios que usas para imágenes
-  },/* config options here */
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 's.gravatar.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.auth0.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost', // Para desarrollo local
+      },
+      {
+        protocol: 'https',
+        hostname: 'tu-dominio.com', // Tu dominio de producción
+      }
+    ],
+  },
+  // Otras configuraciones...
 };
 
 export default nextConfig;

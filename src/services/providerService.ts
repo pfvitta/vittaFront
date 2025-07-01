@@ -1,5 +1,5 @@
 // services/providerService.ts
-import { RegisterProviderValues } from "../types/RegisterProviders";
+import { RegisterProviderValues } from "../types/forms/RegisterProviders";
 
 export const registerProvider = async (data: RegisterProviderValues) => {
     const res = await fetch("http://localhost:4000/auth/signup", {
