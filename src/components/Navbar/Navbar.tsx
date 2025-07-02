@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 
 
 const Navbar = () => {
-  const { isAuthenticated, logout, role, user } = useAuth();
+  const { isAuthenticated, user, role, loading, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const [ isMounted, setIsMounted ] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -33,8 +33,7 @@ const Navbar = () => {
     logout();
     router.push("/auth/logout");
   };
-
-  if (!isMounted) return null;
+if (!isMounted || loading) return null; // ⛔ evita render incorrecto
 
   return (
     <header className="bg-white shadow-sm py-2">
@@ -75,7 +74,7 @@ const Navbar = () => {
                   Soy nutricionista
                 </button>
               </Link>
-              <Link href="/auth/login?userType=user">
+              <Link href="/auth/login?userType=user&returnTo=/dashboard/user">
                 <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
                   Empieza aquí
                 </button>

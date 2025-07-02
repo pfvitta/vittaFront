@@ -14,17 +14,28 @@ export default function DashboardUser() {
   const { user: auth0User, error, isLoading } = useUser();
   const [localUser, setLocalUser] = useState<UserData | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
 
   // Efecto unificado para montaje y registro
   
   useEffect(() => {
   const initializeUser = async () => {
-    if (!auth0User) return;
-    
     try {
+          if (auth0User && !isRegistered) {
       // Verificar si el usuario ya está registrado en tu backend
       // Si no está registrado, proceder con el registro automático
-      if (!isRegistered) {
+
+        console.log('🧠 Usuario_prueba:', auth0User);
+        console.log('🔐 Roles:', auth0User?.role);
+
+        const roles = Array.isArray(auth0User?.role) ? auth0User?.role : [auth0User?.role];
+        const mainRole = roles[0] || 'user';
+
         const userData: RegisterUserValues = {
             name: auth0User.name || "",
             email: auth0User.email || "",
@@ -34,7 +45,7 @@ export default function DashboardUser() {
             dni: "",
             city: "",
             dob: "",
-            role: 'user', // Rol fijo como 'user'
+            role: mainRole, 
           
         };
 
@@ -71,17 +82,19 @@ export default function DashboardUser() {
     }
   };
 
+    if (!hasMounted) return null;
   if (isLoading) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   // Usamos auth0User para datos básicos y localUser para datos extendidos
-  const displayUser = localUser || {
+  const displayUser =  {
     name: auth0User?.name,
     email: auth0User?.email,
     avatarUrl: auth0User?.picture,
     // otros campos por defecto
   };
 
+  console.log("vaalidacion de nombre auth0: ", displayUser.name)
   return (
     <div className="flex p-5">
       {/* Sidebar */}
@@ -162,6 +175,7 @@ export default function DashboardUser() {
                 </div>
                 <div className="space-y-6">
                   <div className="grid gap-4 md:grid-cols-2">
+                    
                     <InfoItem icon={<UserIcon className="h-5 w-5 text-secondary" />} label="Nombre completo" value={displayUser?.name} />
                     <InfoItem icon={<Mail className="h-5 w-5 text-secondary" />} label="Correo electrónico" value={displayUser?.email} />
                     {/* 
