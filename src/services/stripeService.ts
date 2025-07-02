@@ -15,7 +15,7 @@ export const createStripePayment = async (email: string): Promise<{ clientSecret
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) throw new Error('API URL no configurada');
 
-  const response = await fetch(`${apiUrl}/stripe/create-order`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stripe/create-order`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

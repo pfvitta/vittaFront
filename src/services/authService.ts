@@ -10,9 +10,8 @@ export const loginUser = async (credentials: { email: string; password: string }
   if (!res.ok) {
     throw new Error(data.message || "Error al iniciar sesión");
   }
-  return data; // contiene el token
+  return data.token; // contiene el token
 };
-
 
 
 

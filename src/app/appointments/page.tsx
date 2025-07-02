@@ -1,6 +1,11 @@
+import AppointmentPage from "@/components/AppointmentPage.tsx/AppointmentPage"
 
-export default function AppointmentsPage() {
+const AppointmentsPage = () => {
   return (
-    <div>AppointmentsPage</div>
+    <div>
+    <AppointmentPage />
+    </div>
   )
 }
+
+export default AppointmentsPage;
