@@ -8,7 +8,7 @@ export type Specialty = {
     biography: string;
     experience: string;
     licenseNumber: string;
-    specialty: Specialty[];
+    specialty?: Specialty[];
     verified?: boolean;
     verifiedBy?: string | null;
   };
