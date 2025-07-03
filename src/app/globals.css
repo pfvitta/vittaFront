@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #2ECC71;
+  --color-secondary: #2C3E50;
+  --color-tertiary: #F4D03F;
+  --color-background: #FFFFFF;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-secondary);
+  font-family: system-ui, sans-serif;
+}
+
+.input-form {
+  @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition
+}
+
+.title1 {
+  @apply text-4xl font-bold text-secondary text-center mb-6
+}
+
+.title1-green {
+  @apply text-4xl font-bold text-primary text-center mb-6
+}
+
+.title2 {
+  @apply text-lg font-bold text-secondary px-2 py-2
+}
+
+.title2-green {
+  @apply text-lg font-bold text-primary px-2 py-2
+}
+
+.btn-dashboard {
+  @apply w-full flex items-center text-secondary px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition
+}
