@@ -5,21 +5,9 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaMapMarkerAlt, FaBirthdayCake, FaIdCard } from 'react-icons/fa';
+import { Provider } from '@/types/Provider';
 
-interface Provider {
-  id: string;
-  name: string;
-  dni: string;
-  dob: string;
-  city: string;
-  avatarUrl?: string;
-  professionalProfile: {
-    biography: string;
-    experience: string;
-    licenseNumber: string;
-  };
-  specialty: string[];
-}
+
 
 export default function ProviderProfile() {
   const params = useParams();
@@ -57,7 +45,7 @@ export default function ProviderProfile() {
           <div className="flex flex-col md:flex-row">
             <div className="relative w-full md:w-1/3 h-[300px] md:h-auto">
               <Image
-                src={provider.avatarUrl || '/Avatar.jpg'}
+                src={provider.imageUrl || '/Avatar.jpg'}
                 alt="Foto Profesional"
                 fill
                 className="object-cover"
@@ -69,12 +57,12 @@ export default function ProviderProfile() {
               </h1>
 
               <div className="flex flex-wrap gap-2 mb-4">
-                {provider.specialty.map((esp, index) => (
+                {provider.professionalProfile.specialty.map((esp, index) => (
                   <span
                     key={index}
                     className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-full"
                   >
-                    {esp}
+                    {String(esp)}
                   </span>
                 ))}
               </div>
