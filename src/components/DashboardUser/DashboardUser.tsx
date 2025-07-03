@@ -15,6 +15,7 @@ export default function DashboardUser() {
   const [localUser, setLocalUser] = useState<UserData | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  console.log(localUser);
 
   useEffect(() => {
     setHasMounted(true);

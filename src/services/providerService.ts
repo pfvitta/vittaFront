@@ -34,7 +34,7 @@ export const getProviders = async (): Promise<Provider[]> => {
 
     const data = await res.json();
     
-    return data.map((provider: any) => ({
+    return data.map((provider: Provider) => ({
       id: provider.id,
       name: provider.name,
       email: provider.email,

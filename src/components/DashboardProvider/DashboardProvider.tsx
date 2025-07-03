@@ -11,6 +11,7 @@ export default function DashboardProvider() {
   const { user, role, isAuthenticated, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const provider = role === "provider" ? user : null;
+  console.log(isAuthenticated)
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -132,6 +133,7 @@ export default function DashboardProvider() {
                           
                         } catch (error) {
                           alert("No se pudo subir la imagen. Verifica el formato o el tamaño.");
+                          console.error("Error al subir la imagen:", error);
                         }
                       }
                     }}

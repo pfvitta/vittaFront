@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 export const auth0 = new Auth0Client({
   // ✅ Hook que filtra claims y mantiene el rol
   async beforeSessionSaved(session, idToken) {
+    console.log(idToken)
     return {
       ...session,
       user: {

@@ -8,7 +8,6 @@ import { useState } from "react";
 import {useRouter} from 'next/navigation'
 
 const defaultValues: RegisterProviderValues = {
-  user: {
     name: "",
     email: "",
     password: "",
@@ -21,8 +20,7 @@ const defaultValues: RegisterProviderValues = {
   experience: "",
   licenseNumber: "",
   specialty: [],
-  },
-};
+  };
 
 const specialties = [
   "Veganismo",
@@ -78,7 +76,7 @@ export default function RegisterProviderForm() {
             <div>
               <label className="block text-sm font-medium mb-1">Nombre completo</label>
               <input
-                {...register("user.name", {
+                {...register("name", {
                   required: "El nombre es obligatorio",
                   pattern: {
                     value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
@@ -87,14 +85,14 @@ export default function RegisterProviderForm() {
                 })}
                 className="input-form"                
               />
-              {errors.user?.name && <p className="text-red-500 text-sm">{errors.user.name.message}</p>}
+              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Correo electrónico</label>
               <input
                 type="email"
-                {...register("user.email", {
+                {...register("email", {
                   required: "El correo es obligatorio",
                   pattern: {
                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -103,14 +101,14 @@ export default function RegisterProviderForm() {
                 })}
                 className="input-form"
               />
-              {errors.user?.email && <p className="text-red-500 text-sm">{errors.user.email.message}</p>}
+              {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Contraseña</label>
               <input
                 type="password"
-                {...register("user.password", {
+                {...register("password", {
                   required: "La contraseña es obligatoria",
                   minLength: { value: 6, message: "Mínimo 6 caracteres" },
                   pattern: {
@@ -120,13 +118,13 @@ export default function RegisterProviderForm() {
                 })}
                 className="input-form"
               />
-              {errors.user?.password && <p className="text-red-500 text-sm">{errors.user.password.message}</p>}
+              {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Teléfono</label>
               <input
-                {...register("user.phone", {
+                {...register("phone", {
                   required: "El teléfono es obligatorio",
                   minLength: {
                     value: 7,
@@ -135,13 +133,13 @@ export default function RegisterProviderForm() {
                 })} 
                 className="input-form"
               />
-              {errors.user?.phone && <p className="text-red-500 text-sm">{errors.user.phone.message}</p>}
+              {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">DNI</label>
               <input
-                {...register("user.dni", {
+                {...register("dni", {
                   required: "El documento es obligatorio",
                   pattern: {
                     value: /^\d{5,10}$/,
@@ -150,73 +148,73 @@ export default function RegisterProviderForm() {
                 })}
                 className="input-form"
               />
-              {errors.user?.dni && <p className="text-red-500 text-sm">{errors.user.dni.message}</p>}
+              {errors.dni && <p className="text-red-500 text-sm">{errors.dni.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Ciudad</label>
               <input
-                {...register("user.city", {
+                {...register("city", {
                   required: "La ciudad es obligatoria",
                   minLength: { value: 2, message: "Debe tener al menos 2 letras" },
                 })}
                 className="input-form"
               />
-              {errors.user?.city && <p className="text-red-500 text-sm">{errors.user.city.message}</p>}
+              {errors.city && <p className="text-red-500 text-sm">{errors.city.message}</p>}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Fecha de nacimiento</label>
               <input
                 type="date"
-                {...register("user.dob", {
+                {...register("dob", {
                   required: "La fecha es obligatoria",
                 })}
                 className="input-form"
               />
-              {errors.user?.dob && <p className="text-red-500 text-sm">{errors.user.dob.message}</p>}
+              {errors.dob && <p className="text-red-500 text-sm">{errors.dob.message}</p>}
             </div>
 
             {/* --- PROFILE --- */}
             <div>
               <label className="block text-sm font-medium mb-1">Biografía</label>
               <textarea
-                {...register("user.biography", {
+                {...register("biography", {
                   required: "La biografía es obligatoria",
                   minLength: { value: 10, message: "Mínimo 10 caracteres" },
                 })}
                 className="input-form"
               />
-              {errors.user?.biography && (
-                <p className="text-red-500 text-sm">{errors.user.biography.message}</p>
+              {errors.biography && (
+                <p className="text-red-500 text-sm">{errors.biography.message}</p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Experiencia</label>
               <textarea
-                {...register("user.experience", {
+                {...register("experience", {
                   required: "La experiencia es obligatoria",
                   minLength: { value: 10, message: "Mínimo 10 caracteres" },
                 })}
                 className="input-form"
               />
-              {errors.user?.experience && (
-                <p className="text-red-500 text-sm">{errors.user.experience.message}</p>
+              {errors.experience && (
+                <p className="text-red-500 text-sm">{errors.experience.message}</p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-1">Matrícula profesional</label>
               <input
-                {...register("user.licenseNumber", {
+                {...register("licenseNumber", {
                   required: "Campo obligatorio",
                   minLength: { value: 6, message: "Debe tener mínimo 6 caracteres" },
                 })}
                 className="input-form"
               />
-              {errors.user?.licenseNumber && (
-                <p className="text-red-500 text-sm">{errors.user.licenseNumber.message}</p>
+              {errors.licenseNumber && (
+                <p className="text-red-500 text-sm">{errors.licenseNumber.message}</p>
               )}
             </div>
 
@@ -230,7 +228,7 @@ export default function RegisterProviderForm() {
         <input
           type="checkbox"
           value={spec}
-          {...register("user.specialty", {
+          {...register("specialty", {
             required: "Selecciona al menos una especialidad",
           })}
           className="rounded border-gray-300 text-primary focus:ring-primary"
@@ -239,9 +237,9 @@ export default function RegisterProviderForm() {
       </label>
     ))}
   </div>
-  {errors.user?.specialty && (
+  {errors.specialty && (
     <p className="text-red-500 text-sm mt-1">
-      {errors.user.specialty.message}
+      {errors.specialty.message}
     </p>
   )}
 </div>

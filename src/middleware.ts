@@ -23,9 +23,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/acceso-denegado', origin));
   }
 
-  if (path.startsWith('/provider') && !roles.includes('provider')) {
-    return NextResponse.redirect(new URL('/acceso-denegado', origin));
-  }
+  // if (path.startsWith('/provider/id') && !roles.includes('provider')) {
+  //   return NextResponse.redirect(new URL('/acceso-denegado', origin));
+  // }
 
   if (path.startsWith('/user') && !roles.includes('user')) {
     return NextResponse.redirect(new URL('/acceso-denegado', origin));

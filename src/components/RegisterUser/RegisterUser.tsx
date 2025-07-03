@@ -40,7 +40,6 @@ export default function RegisterUserForm() {
 
   const onSubmit = async (data: FormInputs) => {
     const payload: RegisterUserValues = {
-      user: {
         name: data.fullName,
         email: data.email,
         password: data.password,
@@ -50,8 +49,7 @@ export default function RegisterUserForm() {
         city: data.city,
         dob: data.dob,
         role: "user",
-      },
-    };
+      };
 
     try {
       const response = await registerUser(payload);
@@ -269,7 +267,7 @@ export default function RegisterUserForm() {
       </div>
     </div>
   );
-}
+};
 
 
 
