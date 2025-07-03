@@ -19,6 +19,7 @@ type UserData = {
   dob?: string;
   avatarUrl?: string;
   role: string;
+  membership?: 'active' | 'inactive';
   professionalProfile?: {
     biography: string;
     experience: string;

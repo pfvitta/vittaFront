@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext'; 
 
@@ -26,20 +25,24 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
     ? `${imageUrl.split('upload/')[0]}upload/w_300,h_300,c_fill/${imageUrl.split('upload/')[1]}`
     : imageUrl;
 
-  const handleProtectedClick = () => {
-    if (!id) {
-      alert("El ID del profesional no está disponible.");
-      return;
-    }
+const handleProtectedClick = () => {
+  console.log('[handleProtectedClick]', { isAuthenticated, id });
 
-    if (!isAuthenticated) {
-      alert("Debes iniciar sesión para ver el perfil del profesional.");
-      router.push('/login');
-      return;
-    }
+  if (!id) {
+    alert("El ID del profesional no está disponible.");
+    return;
+  }
 
-    router.push(`/providers/${id}`);
-  };
+  if (!isAuthenticated) {
+    alert("Debes iniciar sesión para ver el perfil del profesional.");
+    window.location.href = '/login'; // evita error CORS
+    return;
+  }
+
+  router.push(`/providers/${id}`);
+};
+
+
 
   return (
     <div className="flex bg-gray-100 rounded-xl shadow-md p-4 max-w-3xl w-full">
@@ -68,7 +71,7 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
           {specialty.map((item) => (
             <span
               key={item.id}
-              className="border border-tertiary text-tertiary text-xs px-2 py-1 rounded-full"
+              className="bg-yellow-400 text-white px-3 py-1 rounded-full text-sm font-semibold"
             >
               {item.name}
             </span>
@@ -78,11 +81,13 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
         <p className="text-sm text-secondary mb-3">{biography}</p>
 
         <div className='flex justify-end'>
-          <Link href={`/providers/${id}`} onClick={handleProtectedClick}>
-            <button className="text-sm px-4 py-2 rounded-full bg-secondary text-white hover:bg-primary transition">
-              Ver perfil
-            </button>
-          </Link>
+          <button
+  onClick={handleProtectedClick}
+  className="text-sm px-4 py-2 rounded-full bg-secondary text-white hover:bg-primary transition"
+>
+  Ver perfil
+</button>
+
         </div>
       </div>
     </div>

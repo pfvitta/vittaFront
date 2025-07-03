@@ -8,4 +8,5 @@ export type UserData = {
     dob: string;
     role: "user";
     avatarUrl?: string;
+    membership: "active" | "inactive"; // Cambiado a 'active' o 'inactive'
   };

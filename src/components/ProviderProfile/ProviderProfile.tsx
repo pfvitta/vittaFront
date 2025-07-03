@@ -1,32 +1,32 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
-import { FaMapMarkerAlt, FaBirthdayCake, FaIdCard } from 'react-icons/fa';
+import { getProviderById } from '@/services/providerService';
 import { Provider } from '@/types/Provider';
-
-
+import { useAuth } from '@/context/AuthContext';
+import { MapPin, User, IdCard } from 'lucide-react';
 
 export default function ProviderProfile() {
+  const router = useRouter();
   const params = useParams();
   const id = typeof params.id === 'string' ? params.id : '';
 
+  const { user } = useAuth();
   const [provider, setProvider] = useState<Provider | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
 
     const fetchProvider = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/users/${id}`);
-        if (!res.ok) throw new Error('Error al cargar el perfil');
-        const data = await res.json();
+        const data = await getProviderById(id);
         setProvider(data);
-      } catch (error) {
-        console.error('Error al obtener el perfil del profesional:', error);
+      } catch  {
+        setError('Error al obtener el perfil del profesional');
       } finally {
         setLoading(false);
       }
@@ -35,93 +35,113 @@ export default function ProviderProfile() {
     fetchProvider();
   }, [id]);
 
-  if (loading) return <p className="text-center p-8">Cargando perfil...</p>;
-  if (!provider) return <p className="text-center p-8 text-red-600">No se encontró el profesional.</p>;
+  const handleBookingClick = () => {
+    if (!user?.membership || user.membership !== 'active') {
+      router.push(`/memberships?redirectTo=/providers/${id}`);
+    } else {
+      router.push(`/appointments/create?providerId=${id}`);
+    }
+  };
+
+  if (loading) return <p className="p-4">Cargando perfil...</p>;
+  if (error || !provider) return <p className="p-4 text-red-500">Error: {error}</p>;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
-      <div className="space-y-6">
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="flex flex-col md:flex-row">
-            <div className="relative w-full md:w-1/3 h-[300px] md:h-auto">
-              <Image
-                src={provider.imageUrl || '/Avatar.jpg'}
-                alt="Foto Profesional"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="p-6 flex-1">
-              <h1 className="text-3xl font-bold text-secondary mb-2">
-                {provider.name}
-              </h1>
+    <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Imagen */}
+      <div className="col-span-1 flex justify-center md:justify-start">
+        <div className="w-60 h-60 relative rounded-xl border border-primary overflow-hidden">
+          <Image
+            src={provider.imageUrl || '/Avatar.jpg'}
+            alt={provider.name}
+            fill
+            className="object-cover"
+          />
+        </div>
+      </div>
 
-              <div className="flex flex-wrap gap-2 mb-4">
-                {provider.professionalProfile.specialty.map((esp, index) => (
-                  <span
-                    key={index}
-                    className="bg-yellow-100 text-yellow-800 text-xs font-semibold px-3 py-1 rounded-full"
-                  >
-                    {String(esp)}
-                  </span>
-                ))}
-              </div>
-
-              <p className="text-gray-600 text-sm mb-4">{provider.professionalProfile?.biography}</p>
-
-              <div className="flex items-center text-green-500 gap-1 text-sm font-medium">
-                ★★★★★
-                <span className="text-gray-600 ml-2">80 opiniones</span>
-              </div>
-            </div>
-          </div>
+      {/* Perfil principal */}
+      <div className="md:col-span-2">
+        <h1 className="text-4xl font-bold text-secondary">{provider.name}</h1>
+        <div className="flex flex-wrap gap-2 mt-2">
+          {provider.professionalProfile?.specialty?.map((s) => (
+            <span key={s.id} className="bg-yellow-400 text-white px-3 py-1 rounded-full text-sm font-semibold">
+              {s.name}
+            </span>
+          ))}
         </div>
 
-        <div className="bg-gray-100 p-6 rounded-xl shadow-sm space-y-4">
-          <h2 className="text-xl font-bold text-secondary">Datos personales</h2>
-          <div className="flex items-center gap-3 text-gray-700">
-            <FaBirthdayCake /> {provider.dob}
+        <p className="text-gray-600 mt-4 text-sm leading-relaxed">{provider.professionalProfile.biography}</p>
+
+        {/* Reseñas simuladas */}
+        <div className="flex items-center mt-3 text-green-600 font-semibold text-sm">
+          ★★★★★ <span className="ml-2 text-gray-500 font-normal">80 customer reviews</span>
+        </div>
+      </div>
+
+      {/* Datos personales */}
+      <div className="md:col-span-1 bg-gray-50 p-6 rounded-xl shadow-md">
+        <h2 className="text-lg font-bold text-secondary mb-4">Datos personales</h2>
+        <div className="text-gray-700 space-y-3 text-sm">
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-primary" />
+            <span>{provider.dob}</span>
           </div>
-          <div className="flex items-center gap-3 text-gray-700">
-            <FaMapMarkerAlt /> {provider.city}
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-primary" />
+            <span>{provider.city}</span>
           </div>
-          <div className="flex items-center gap-3 text-gray-700">
-            <FaIdCard /> Matrícula {provider.professionalProfile?.licenseNumber}
+          <div className="flex items-center gap-2">
+            <IdCard className="w-4 h-4 text-primary" />
+            <span>Matrícula {provider.professionalProfile.licenseNumber}</span>
           </div>
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-bold text-secondary mb-2">Agendá tu turno</h2>
-          <p className="text-green-600 font-semibold mb-2">Lunes a viernes de 8:00hs a 15:00hs</p>
-          <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
-            <li>Los turnos son a través de videollamadas.</li>
-            <li>La tolerancia de espera es de 10 min.</li>
-            <li>Disponer de micrófono y cámara.</li>
-          </ul>
-          <Link href="/appointments">
-            <button className="mt-4 bg-secondary text-white px-4 py-2 rounded-full text-sm hover:bg-primary transition">
-              Agendar turno
-            </button>
-          </Link>
-        </div>
+      {/* Agenda */}
+      <div className="md:col-span-1 bg-gray-50 p-6 rounded-xl shadow-md">
+        <h2 className="text-lg font-bold text-secondary mb-1">Agenda tus consultas del mes</h2>
+        <p className="text-green-600 font-semibold text-sm mb-2">Haz clic para ver la disponibilidad</p>
+        <ul className="text-sm text-gray-700 list-disc list-inside space-y-1">
+          <li>Los turnos son a través de videollamadas.</li>
+          <li>La tolerancia de espera es de 10 min.</li>
+          <li>Disponer de micrófono y cámara.</li>
+        </ul>
 
-        <div className="bg-white p-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-bold text-secondary mb-2">Membresía</h2>
-          <p className="text-primary font-bold text-lg">$50.000 c/mes</p>
-          <p className="text-sm text-gray-600 mt-1">
-            Incluye 2 sesiones al mes para consultas, controles o planes alimenticios.
-          </p>
-          <Link href="/memberships">
-            <button className="mt-4 bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary transition">
-              Acceder ahora
-            </button>
-          </Link>
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={handleBookingClick}
+            className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-full text-sm transition"
+          >
+            Agendar citas
+          </button>
+        </div>
+      </div>
+
+      {/* Membresía */}
+      <div className="md:col-span-1 bg-gray-50 p-6 rounded-xl shadow-md">
+        <h2 className="text-lg font-bold text-secondary mb-1">Membresía</h2>
+        <p className="text-green-600 font-bold text-lg">$50.000 c/ mes</p>
+        <p className="text-sm text-gray-700 mt-1">
+          Incluye 4 sesiones al mes para consultas (1 semanal), controles o planes alimenticios.
+        </p>
+
+        <div className="mt-4">
+          <button
+            onClick={() => router.push('/memberships')}
+            className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-full text-sm transition w-full"
+          >
+            Acceder ahora
+          </button>
         </div>
       </div>
     </div>
   );
 }
+
+
+
+
+
 
 
