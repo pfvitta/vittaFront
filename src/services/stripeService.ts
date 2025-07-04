@@ -13,7 +13,28 @@ export const initializeStripe = async () => {
   return stripe;
 };
 
-export const createStripePayment = async (): Promise<{ clientSecret: string }> => {
+// services/stripeService.ts
+export const createCheckoutSession = async (email: string): Promise<{ url: string }> => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stripe/create-checkout-session`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'No se pudo crear la sesión de pago');
+  }
+
+  const data = await response.json();
+  if (!data.url) throw new Error('No se recibió una URL válida de Stripe');
+  return data;
+};
+
+
+export const createStripePayment = async (email: string): Promise<{ clientSecret: string }> => {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const response = await fetch(`${apiUrl}/stripe/create-order`, {
@@ -21,6 +42,7 @@ export const createStripePayment = async (): Promise<{ clientSecret: string }> =
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ email }), // 👈 Aquí se envía el email
     });
 
     if (!response.ok) {
@@ -29,7 +51,7 @@ export const createStripePayment = async (): Promise<{ clientSecret: string }> =
     }
 
     const data = await response.json();
-    
+
     if (!data.clientSecret) {
       throw new Error('Missing clientSecret in response');
     }
