@@ -36,7 +36,7 @@ const Navbar = () => {
 if (!isMounted || loading) return null; // ⛔ evita render incorrecto
 
   return (
-    <header className="bg-white shadow-sm py-2">
+    <header className="relative z-50 bg-white shadow-sm py-2">
       <div className="max-w-screen-xl h-[60px] mx-auto flex items-center justify-between px-4 rounded-[100px] bg-white drop-shadow-lg">
         {/* Logo */}
         <div className="flex items-center space-x-2">
@@ -102,7 +102,7 @@ if (!isMounted || loading) return null; // ⛔ evita render incorrecto
                 </button>
 
                 {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-md z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-md z-[999]">
                     <Link
                       href={role === 'provider' ? "/dashboard/provider" : "/dashboard/user"}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
