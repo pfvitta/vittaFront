@@ -1,45 +1,66 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext'; // importa tu contexto
+import { useAuth } from '@/context/AuthContext';
 
 export default function SuccessPage() {
   const router = useRouter();
-  const { setUser } = useAuth(); // ← importante para actualizar el estado global del usuario
+  const { setUser } = useAuth();
+  const previousPath = typeof window !== 'undefined' 
+    ? localStorage.getItem('previousPath') || '/' 
+    : '/';
+
+  const [membershipConfirmed, setMembershipConfirmed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const fetchUpdatedUser = async () => {
-      try {
-        const res = await fetch('http://localhost:4000/auth/me', {
-          credentials: 'include',
-        });
-        const data = await res.json();
-        if (res.ok && data?.user) {
-          setUser(data.user); // esto actualiza el contexto y activa hasMembership
+    const fetchUntilUpdated = async (retries = 6, delay = 1000) => {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch('/api/session', {
+            credentials: 'include',
+          });
+          const data = await res.json();
+
+          if (res.ok && data?.user) {
+            setUser(data.user);
+            console.log('[SuccessPage] Usuario actualizado después del pago:', data.user);
+
+
+            if (data.user.membership?.status === 'Active') {
+              setMembershipConfirmed(true);
+              router.push(previousPath);
+              return;
+            }
+          }
+        } catch (error) {
+          console.error('❌ Error al verificar membresía activa:', error);
         }
-      } catch (error) {
-        console.error('❌ Error al actualizar el usuario después del pago:', error);
+        await new Promise(res => setTimeout(res, delay));
       }
+
+      // Si no se logró confirmar membresía
+      setMembershipConfirmed(false);
+      router.push(previousPath);
     };
 
-    const previousPath = localStorage.getItem('previousPath') || '/';
-
-    fetchUpdatedUser(); // actualizar el usuario inmediatamente
-
-    const timeout = setTimeout(() => {
-      router.push(previousPath);
-    }, 2500);
-
-    return () => clearTimeout(timeout);
-  }, [router, setUser]);
+    fetchUntilUpdated();
+  }, [router, setUser, previousPath]);
 
   return (
     <div className="text-center py-20">
       <h1 className="text-green-600 text-2xl font-bold mb-2">¡Pago exitoso! 🎉</h1>
-      <p className="text-gray-500">Redirigiendo a tu página anterior...</p>
+      {membershipConfirmed === false ? (
+        <p className="text-red-500">
+          No pudimos confirmar tu membresía, pero te redirigimos igual. Si el problema persiste, por favor contacta soporte.
+        </p>
+      ) : (
+        <p className="text-gray-500">Verificando tu membresía y redirigiendo...</p>
+      )}
     </div>
   );
 }
+
+
 
 

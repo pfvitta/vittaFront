@@ -7,12 +7,12 @@ import { useEffect, useState } from 'react';
 function Providers() {
   const { providers, loading, error, refreshProviders } = useProviders();
   const [hasHydrated, setHasHydrated] = useState(false);
-  
+
   // Filtramos solo los providers con rol 'provider'
   const filteredProviders = providers.filter(provider => provider.role === 'provider');
 
   useEffect(() => {
-    if (filteredProviders.length === 0 && !loading) {  // Cambiamos providers por filteredProviders
+    if (filteredProviders.length === 0 && !loading) {
       const savedProviders = localStorage.getItem('providersData');
       if (savedProviders) {
         try {
@@ -24,13 +24,13 @@ function Providers() {
       }
       setHasHydrated(true);
     }
-  }, [filteredProviders.length, loading]);  // Cambiamos providers por filteredProviders
+  }, [filteredProviders.length, loading]);
 
   useEffect(() => {
-    if (filteredProviders.length > 0 && hasHydrated) {  // Cambiamos providers por filteredProviders
-      localStorage.setItem('providersData', JSON.stringify(filteredProviders));  // Guardamos los filtrados
+    if (filteredProviders.length > 0 && hasHydrated) {
+      localStorage.setItem('providersData', JSON.stringify(filteredProviders));
     }
-  }, [filteredProviders, hasHydrated]);  // Cambiamos providers por filteredProviders
+  }, [filteredProviders, hasHydrated]);
 
   if (loading && !hasHydrated) {
     return (
@@ -54,7 +54,7 @@ function Providers() {
     );
   }
 
-  if (filteredProviders.length === 0) {  // Cambiamos providers por filteredProviders
+  if (filteredProviders.length === 0) {
     return (
       <div className="flex flex-col items-center gap-6 px-4 py-10">
         <p>No hay profesionales disponibles</p>
@@ -70,8 +70,21 @@ function Providers() {
 
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-10">
-      <h1 className='title1'>Nuestros profesionales</h1>
-      {filteredProviders.map((provider) => (  // Cambiamos providers por filteredProviders
+      <div className="max-w-4xl text-center">
+        {/* <h1 className='title1'>Nuestros profesionales</h1> */}
+        <h2 className="text-2xl font-bold text-primary mb-2">Elige al nutricionista ideal para ti</h2>
+        <p className="text-secondary mb-4">
+          En Vitta, conectamos personas con profesionales de la nutrición certificados en distintas especialidades como veganismo, diabetes, obesidad y más.
+          Próximamente podrás filtrar por tus objetivos, leer reseñas de pacientes reales y agendar con un clic.
+        </p>
+        <p className="text-primary font-semibold">
+          Por ahora, explora nuestros perfiles y encuentra el especialista que más se adapte a ti.
+        </p>
+      </div>
+
+      
+
+      {filteredProviders.map((provider) => (
         <CardProvider
           key={provider.id}
           id={provider.id}
