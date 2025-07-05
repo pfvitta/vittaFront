@@ -6,11 +6,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { handleImageUpload } from "@/services/uploadImageService";
+import { Provider } from "@/types/Provider";
 
 export default function DashboardProvider() {
   const { user, role, isAuthenticated, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
-  const provider = role === "provider" ? user : null;
+  const provider = role === "provider" ? (user as Provider) : null;
   console.log(isAuthenticated)
 
   useEffect(() => {

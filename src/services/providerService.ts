@@ -45,7 +45,6 @@ export const getProviders = async (): Promise<Provider[]> => {
   status: provider.status,
   createdAt: provider.createdAt,
   role: provider.role,
-  membership: provider.membership,
   professionalProfile: provider.professionalProfile,
   avatarUrl: provider.imageUrl,
   specialty: provider.professionalProfile?.specialty || [],
@@ -84,7 +83,6 @@ export const getProviderById = async (id: string): Promise<Provider> => {
       role: provider.role,
       status: provider.status,
       createdAt: provider.createdAt,
-      membership: provider.membership,
       imageUrl: provider.avatarUrl || provider.imageUrl, // 👈 esto es lo que espera tu tipo
       professionalProfile: {
         id: provider.professionalProfile?.id,
