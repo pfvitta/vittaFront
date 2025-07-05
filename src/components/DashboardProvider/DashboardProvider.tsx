@@ -7,12 +7,13 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { handleImageUpload } from "@/services/uploadImageService";
 import { Provider } from "@/types/Provider";
+import { useProviders } from "@/context/ProvidersContext";
 
 export default function DashboardProvider() {
-  const { user, role, isAuthenticated, setUser } = useAuth();
+  const { refreshProviders } = useProviders();
+  const { user, role, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const provider = role === "provider" ? (user as Provider) : null;
-  console.log(isAuthenticated)
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -33,25 +34,37 @@ export default function DashboardProvider() {
     window.location.href = "/login";
   };
 
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !provider) return;
+
+    try {
+      const result = await handleImageUpload(file, provider.id);
+      if (result?.imgUrl) {
+        const updated = {
+          ...provider,
+          file: { ...(provider.file || {}), imgUrl: result.imgUrl },
+        };
+        setUser(updated);
+        localStorage.setItem("user", JSON.stringify(updated));
+        refreshProviders();
+      }
+    } catch (error) {
+      alert("No se pudo subir la imagen. Verifica el formato o el tamaño.");
+      console.error("Error al subir la imagen:", error);
+    }
+  };
+
   if (loading) {
-    return (
-      <div className="text-center py-10 text-gray-500">
-        Cargando...
-      </div>
-    );
+    return <div className="text-center py-10 text-gray-500">Cargando...</div>;
   }
 
   if (!provider) {
-    return (
-      <div className="text-center py-10 text-gray-500">
-        Redirigiendo...
-      </div>
-    );
+    return <div className="text-center py-10 text-gray-500">Redirigiendo...</div>;
   }
 
   return (
     <div className="flex p-5">
-      {/* Sidebar */}
       <aside className="bg-gray-100 m-1 rounded-xl border-gray-200 min-h-screen">
         <div className="p-4">
           <nav className="space-y-2">
@@ -78,7 +91,6 @@ export default function DashboardProvider() {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="flex-2 p-1">
         <div className="max-w-5xl bg-gray-100 rounded-xl p-9 mx-auto">
           <div className="mb-8">
@@ -89,7 +101,6 @@ export default function DashboardProvider() {
           </div>
 
           <div className="grid gap-3 md:grid-cols-4">
-            {/* Profile Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-10 text-center">
                 <div className="flex justify-center mb-4">
@@ -117,33 +128,12 @@ export default function DashboardProvider() {
                     type="file"
                     accept="image/*"
                     hidden
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (file && provider && "id" in provider) {
-                        try {
-                          const result = await handleImageUpload(file, provider.id);
-
-                          if (result?.imgUrl) {
-                            const updated = {
-                              ...provider,
-                              file: { ...(provider.file || {}), imgUrl: result.imgUrl }
-                            };
-                            setUser(updated);
-                            localStorage.setItem("user", JSON.stringify(updated));
-                          }
-                          
-                        } catch (error) {
-                          alert("No se pudo subir la imagen. Verifica el formato o el tamaño.");
-                          console.error("Error al subir la imagen:", error);
-                        }
-                      }
-                    }}
+                    onChange={handleImageChange}
                   />
                 </label>
               </div>
             </div>
 
-            {/* Información Personal */}
             <div className="md:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6">
                 <div className="mb-4 text-center">
@@ -167,7 +157,6 @@ export default function DashboardProvider() {
               </div>
             </div>
 
-            {/* Biografía */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6">
                 <h2 className="title2 text-center">Biografía</h2>
@@ -178,7 +167,6 @@ export default function DashboardProvider() {
             </div>
           </div>
 
-          {/* Sección de Turnos */}
           <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-6">
               <h2 className="title2 text-center mb-4">Mis Turnos</h2>

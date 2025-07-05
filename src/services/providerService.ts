@@ -33,28 +33,30 @@ export const getProviders = async (): Promise<Provider[]> => {
     }
 
     const data = await res.json();
-    
+
     return data.map((provider: Provider) => ({
-  id: provider.id,
-  name: provider.name,
-  email: provider.email,
-  phone: provider.phone,
-  dni: provider.dni,
-  city: provider.city,
-  dob: provider.dob,
-  status: provider.status,
-  createdAt: provider.createdAt,
-  role: provider.role,
-  professionalProfile: provider.professionalProfile,
-  avatarUrl: provider.imageUrl,
-  specialty: provider.professionalProfile?.specialty || [],
-  biography: provider.professionalProfile?.biography || 'Descripción no disponible'
-}));
+      id: provider.id,
+      name: provider.name,
+      email: provider.email,
+      phone: provider.phone,
+      dni: provider.dni,
+      city: provider.city,
+      dob: provider.dob,
+      status: provider.status,
+      createdAt: provider.createdAt,
+      role: provider.role,
+      professionalProfile: provider.professionalProfile,
+      imageUrl: provider.imageUrl || provider.file?.imgUrl || '/Avatar.jpg',
+      file: provider.file,
+      specialty: provider.professionalProfile?.specialty || [],
+      biography: provider.professionalProfile?.biography || 'Descripción no disponible',
+    }));
   } catch (err) {
     console.error('Error fetching providers:', err);
     throw err;
   }
 };
+
 
 
 
@@ -83,7 +85,8 @@ export const getProviderById = async (id: string): Promise<Provider> => {
       role: provider.role,
       status: provider.status,
       createdAt: provider.createdAt,
-      imageUrl: provider.avatarUrl || provider.imageUrl, // 👈 esto es lo que espera tu tipo
+      imageUrl: provider.imageUrl || provider.avatarUrl || provider.file?.imgUrl || '/Avatar.jpg',
+      file: provider.file,
       professionalProfile: {
         id: provider.professionalProfile?.id,
         biography: provider.professionalProfile?.biography || '',
@@ -98,6 +101,4 @@ export const getProviderById = async (id: string): Promise<Provider> => {
     console.error("Error fetching provider by ID:", err);
     throw err;
   }
-  
 };
-
