@@ -1,7 +1,11 @@
-// app/success/page.tsx
+'use client';
+
+import PaymentSuccessPage from '../../components/PaymentSuccess/PaymentSuccessPage';
+
 export default function SuccessPage() {
-  return <h1 className="text-green-600 text-xl">¡Pago exitoso! 🎉</h1>;
+  return <PaymentSuccessPage />;
 }
+
 
 
 

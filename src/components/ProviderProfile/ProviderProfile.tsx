@@ -7,13 +7,14 @@ import { getProviderById } from '@/services/providerService';
 import { Provider } from '@/types/Provider';
 import { useAuth } from '@/context/AuthContext';
 import { MapPin, User, IdCard } from 'lucide-react';
+import { goToMembershipWithReturn } from '@/app/utils/navigation';
 
 export default function ProviderProfile() {
   const router = useRouter();
   const params = useParams();
   const id = typeof params.id === 'string' ? params.id : '';
 
-  const { user } = useAuth();
+  const { hasMembership } = useAuth();
   const [provider, setProvider] = useState<Provider | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +37,7 @@ export default function ProviderProfile() {
   }, [id]);
 
   const handleBookingClick = () => {
-    if (!user?.membership || user.membership !== 'active') {
+    if (!hasMembership) {
       router.push(`/memberships?redirectTo=/providers/${id}`);
     } else {
       router.push(`/appointments/create?providerId=${id}`);
@@ -128,11 +129,12 @@ export default function ProviderProfile() {
 
         <div className="mt-4">
           <button
-            onClick={() => router.push('/memberships')}
-            className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-full text-sm transition w-full"
-          >
-            Acceder ahora
-          </button>
+  onClick={() => goToMembershipWithReturn(router)}
+  className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-full text-sm transition w-full"
+>
+  Acceder ahora
+</button>
+
         </div>
       </div>
     </div>

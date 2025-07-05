@@ -1,14 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CreditCard } from 'lucide-react';
-import { createCheckoutSession } from '@/services/stripeService'; // Nuevo servicio
+import { createCheckoutSession } from '@/services/stripeService';
 import { useAuth } from '@/context/AuthContext'; 
 
 const Memberships = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState<'stripe' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const from = searchParams.get('from');
+    if (from && from !== '/memberships') {
+      localStorage.setItem('previousPath', from);
+    }
+  }, [searchParams]);
 
   const handleStripeCheckout = async () => {
     setLoading('stripe');
@@ -16,7 +25,6 @@ const Memberships = () => {
 
     try {
       if (!user?.email) throw new Error('Usuario no autenticado o sin email');
-
       const { url } = await createCheckoutSession(user.email);
       window.location.href = url;
     } catch (err) {
@@ -80,4 +88,5 @@ const Memberships = () => {
 };
 
 export default Memberships;
+
 

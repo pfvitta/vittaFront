@@ -9,8 +9,11 @@ import { useUser } from '@auth0/nextjs-auth0';
 import { registerUser } from '@/services/userService';
 import { RegisterUserValues } from '@/types/forms/RegisterUser';
 import { UserData } from '@/types/User';
+import { goToMembershipWithReturn } from '@/app/utils/navigation';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardUser() {
+  const router = useRouter();
   const { user: auth0User, error, isLoading } = useUser();
   const [localUser, setLocalUser] = useState<UserData | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -198,11 +201,13 @@ export default function DashboardUser() {
                 <p className="text-gray-500 text-sm mt-2 mb-4">Dos sesiones al mes</p>
                 <p className="text-gray-500 text-sm mb-4">Plan nutricional personalizado</p>
                 <p className="text-gray-500 text-sm mb-4">Seguimiento seguro de tu salud</p>
-                <Link href="/memberships">
-                  <button className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">
-                    Acceder ahora
-                  </button>
-                </Link>
+                <button
+  onClick={() => goToMembershipWithReturn(router)}
+  className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition"
+>
+  Acceder ahora
+</button>
+
               </div>
             </div>
           </div>

@@ -6,12 +6,12 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-
+import { goToMembershipWithReturn } from "@/app/utils/navigation";
 
 const Navbar = () => {
-  const { isAuthenticated, user, role, loading, logout } = useAuth();
+  const { isAuthenticated, user, role, loading, logout, hasMembership } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
-  const [ isMounted, setIsMounted ] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
@@ -33,7 +33,9 @@ const Navbar = () => {
     logout();
     router.push("/auth/logout");
   };
-if (!isMounted || loading) return null; // ⛔ evita render incorrecto
+
+  // ⛔ evita renderizar hasta que esté montado, cargado y haya información clara de membresía
+  if (!isMounted || loading || (isAuthenticated && role === 'user' && hasMembership === undefined)) return null;
 
   return (
     <header className="relative z-50 bg-white shadow-sm py-2">
@@ -82,16 +84,17 @@ if (!isMounted || loading) return null; // ⛔ evita render incorrecto
             </>
           ) : (
             <div className="flex items-center">
-              {role === 'user' && (
-                <Link href="/memberships" className="mr-3">
-                  <button className="bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
-                    Acceder a membresía
-                  </button>
-                </Link>
+              {role === 'user' && !hasMembership && (
+                <button
+                  onClick={() => goToMembershipWithReturn(router)}
+                  className="bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition"
+                >
+                  Acceder a membresía
+                </button>
               )}
-              
+
               <div className="relative" ref={dropdownRef}>
-                <button 
+                <button
                   onClick={() => setShowDropdown((prev) => !prev)}
                   className="flex items-center space-x-1"
                 >
@@ -130,3 +133,4 @@ if (!isMounted || loading) return null; // ⛔ evita render incorrecto
 };
 
 export default Navbar;
+

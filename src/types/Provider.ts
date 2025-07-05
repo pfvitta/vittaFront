@@ -25,6 +25,11 @@ export type Specialty = {
     imageUrl?: string;
     status?: string;
     createdAt?: string;
-    membership: boolean; // ✅ true si pagó
     professionalProfile: ProfessionalProfile;
+    file?: {
+    id?: string;
+    imgUrl?: string;
+    filename?: string;
+    mimetype?: string;
+  };
   }
