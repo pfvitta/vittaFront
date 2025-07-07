@@ -7,7 +7,6 @@ import { getProviderById } from '@/services/providerService';
 import { Provider } from '@/types/Provider';
 import { useAuth } from '@/context/AuthContext';
 import { MapPin, User, IdCard } from 'lucide-react';
-import { goToMembershipWithReturn } from '@/app/utils/navigation';
 
 export default function ProviderProfile() {
   const router = useRouter();
@@ -26,7 +25,7 @@ export default function ProviderProfile() {
       try {
         const data = await getProviderById(id);
         setProvider(data);
-      } catch  {
+      } catch {
         setError('Error al obtener el perfil del profesional');
       } finally {
         setLoading(false);
@@ -72,7 +71,9 @@ export default function ProviderProfile() {
           ))}
         </div>
 
-        <p className="text-gray-600 mt-4 text-sm leading-relaxed">{provider.professionalProfile.biography}</p>
+        <p className="text-gray-600 mt-4 text-sm leading-relaxed">
+          {provider.professionalProfile.biography}
+        </p>
 
         {/* Reseñas simuladas */}
         <div className="flex items-center mt-3 text-green-600 font-semibold text-sm">
@@ -119,27 +120,18 @@ export default function ProviderProfile() {
         </div>
       </div>
 
-      {/* Membresía */}
+      {/* Membresía (solo información) */}
       <div className="md:col-span-1 bg-gray-50 p-6 rounded-xl shadow-md">
         <h2 className="text-lg font-bold text-secondary mb-1">Membresía</h2>
         <p className="text-green-600 font-bold text-lg">$50.000 c/ mes</p>
         <p className="text-sm text-gray-700 mt-1">
           Incluye 4 sesiones al mes para consultas (1 semanal), controles o planes alimenticios.
         </p>
-
-        <div className="mt-4">
-          <button
-  onClick={() => goToMembershipWithReturn(router)}
-  className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-full text-sm transition w-full"
->
-  Acceder ahora
-</button>
-
-        </div>
       </div>
     </div>
   );
 }
+
 
 
 

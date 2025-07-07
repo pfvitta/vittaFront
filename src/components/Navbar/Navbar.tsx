@@ -34,57 +34,50 @@ const Navbar = () => {
     router.push("/auth/logout");
   };
 
-  // ⛔ evita renderizar hasta que esté montado, cargado y haya información clara de membresía
-  if (!isMounted || loading || (isAuthenticated && role === 'user' && hasMembership === undefined)) return null;
+  if (!isMounted || loading || (isAuthenticated && role === 'user' && hasMembership === undefined)) {
+    return null;
+  }
 
   return (
     <header className="relative z-50 bg-white shadow-sm py-2">
       <div className="max-w-screen-xl h-[60px] mx-auto flex items-center justify-between px-4 rounded-[100px] bg-white drop-shadow-lg">
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <Link href="/" passHref>
-            <Image
-              src="/logo-png-vitta2.png"
-              alt="Logo Vitta"
-              width={80}
-              height={80}
-              className="-my-1 cursor-pointer"
-              priority
-            />
-          </Link>
-        </div>
+        <Link href="/">
+          <Image
+            src="/logo-png-vitta2.png"
+            alt="Logo Vitta"
+            width={80}
+            height={80}
+            className="-my-1 cursor-pointer"
+            priority
+          />
+        </Link>
 
-        {/* Links */}
         <nav className="space-x-8 text-md font-medium text-secondary">
           <Link href="/providers">Profesionales</Link>
           <Link href="/about-us">Acerca de nosotros</Link>
           <Link href="/blog">Blog</Link>
         </nav>
 
-        {/* Autenticación */}
         <div className="flex items-center space-x-2 relative">
           {!isAuthenticated ? (
             <>
-              <Link
-                href="/login"
-                className="text-secondary px-4 py-2 rounded-full text-bold text-sm hover:text-secondary transition"
-              >
+              <Link href="/login" className="text-secondary px-4 py-2 rounded-full text-sm hover:text-secondary transition">
                 Iniciar sesión
               </Link>
               <Link href="/register/provider">
-                <button className="bg-tertiary border border-white text-secondary px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                <button className="bg-tertiary text-secondary px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
                   Soy nutricionista
                 </button>
               </Link>
               <Link href="/auth/login?userType=user&returnTo=/dashboard/user">
-                <button className="bg-primary border border-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
+                <button className="bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition">
                   Empieza aquí
                 </button>
               </Link>
             </>
           ) : (
             <div className="flex items-center">
-              {role === 'user' && !hasMembership && (
+              {role === 'user' && hasMembership === false && (
                 <button
                   onClick={() => goToMembershipWithReturn(router)}
                   className="bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-secondary hover:text-white transition"
@@ -133,4 +126,7 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+
+
 

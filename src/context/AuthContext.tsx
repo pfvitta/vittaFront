@@ -30,7 +30,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [hasMembership, setHasMembership] = useState<boolean>(false);
 
-  // Verifica sesión de Auth0 o localStorage
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -42,10 +41,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.log('[SESSION] Data:', data);
 
           if (data?.user) {
-            setUser(data.user);
+            const existsRes = await fetch(
+              `http://localhost:4000/users/exists/${data.user.email}`
+            );
+
+            if (existsRes.status === 404) {
+              console.log('[SYNC] Usuario no existe. Creando...');
+              await fetch('http://localhost:4000/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: data.user.name || 'Usuario',
+                  email: data.user.email,
+                  password: 'auth0',
+                  phone: '0000000000',
+                  dni: '00000000',
+                  city: 'Sin definir',
+                  dob: '2000-01-01',
+                  role: data.role || 'user',
+                }),
+              });
+              console.log('[SYNC] Usuario creado');
+            }
+
+            const userRes = await fetch(
+              `http://localhost:4000/users/by-email/${data.user.email}`
+            );
+            const fullUser = await userRes.json();
+
+            setUser(fullUser);
             setRole(data.role);
             setIsAuthenticated(true);
-            setLoading(false);
             return;
           }
         }
@@ -69,7 +95,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
-  // Detecta membresía activa
   useEffect(() => {
     if (role === 'user' && (user as UserData)?.membership?.status === 'Active') {
       setHasMembership(true);
