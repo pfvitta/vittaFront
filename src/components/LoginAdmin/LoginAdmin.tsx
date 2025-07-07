@@ -6,11 +6,13 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
     try {
       const res = await fetch('http://localhost:4000/admin/login', {
@@ -21,20 +23,26 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!res.ok) throw new Error('Error en el login');
-
       const data = await res.json();
       console.log('Respuesta del login:', data);
 
-      // Verificamos el rol desde data.users.role
-      if (data.users?.role === 'Admin') {
-        localStorage.setItem('token', data.token);
-        router.push('/pepita-flores/dashboard-admin');
-        } else {
-        setError('No tienes permisos de administrador');
-        }
-    } catch {
-      setError('Credenciales incorrectas');
+      if (!res.ok) {
+        // Usa el mensaje de error del backend si está disponible
+        throw new Error(data.message || 'Credenciales incorrectas');
+      }
+
+      // Verificación simplificada - solo comprobamos que la respuesta sea exitosa
+      // Guardamos el email en localStorage (opcional)
+      localStorage.setItem('adminEmail', email);
+      
+      // Redirigimos al dashboard
+      router.push('/pepita-flores/dashboard-admin');
+
+    } catch (err: any) {
+      console.error('Error en el login:', err);
+      setError(err.message || 'Credenciales incorrectas');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,6 +57,7 @@ export default function AdminLoginPage() {
           className="w-full mb-2 p-2 border rounded"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <input
           type="password"
@@ -56,12 +65,16 @@ export default function AdminLoginPage() {
           className="w-full mb-4 p-2 border rounded"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition"
+          disabled={isLoading}
+          className={`w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition ${
+            isLoading ? 'opacity-75 cursor-not-allowed' : ''
+          }`}
         >
-          Ingresar
+          {isLoading ? 'Verificando...' : 'Ingresar'}
         </button>
       </form>
     </div>
