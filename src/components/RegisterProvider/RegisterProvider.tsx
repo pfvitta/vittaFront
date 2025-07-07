@@ -5,22 +5,22 @@ import { registerProvider } from "@/services/providerService";
 import { RegisterProviderValues } from "@/types/forms/RegisterProviders";
 import Image from "next/image";
 import { useState } from "react";
-import {useRouter} from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 const defaultValues: RegisterProviderValues = {
-    name: "",
-    email: "",
-    password: "",
-    phone: "",
-    dni: "",
-    city: "",
-    dob: "",
-    role: "provider",
+  name: "",
+  email: "",
+  password: "",
+  phone: "",
+  dni: "",
+  city: "",
+  dob: "",
+  role: "provider",
   biography: "",
   experience: "",
   licenseNumber: "",
   specialty: [],
-  };
+};
 
 const specialties = [
   "Veganismo",
@@ -31,10 +31,10 @@ const specialties = [
   "Trastornos alimenticios",
 ];
 
-
 export default function RegisterProviderForm() {
-  
   const [, setSubmittedData] = useState<RegisterProviderValues | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -45,9 +45,9 @@ export default function RegisterProviderForm() {
     mode: "onChange",
     defaultValues,
   });
-  
-  const router = useRouter();
+
   const onSubmit = async (data: RegisterProviderValues) => {
+    setIsLoading(true);
     try {
       const response = await registerProvider(data);
       alert("Registro exitoso");
@@ -57,11 +57,23 @@ export default function RegisterProviderForm() {
     } catch (error) {
       console.error(error);
       alert("Hubo un error al registrar");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F7FAFC] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-[#F7FAFC] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans relative">
+      {/* Overlay de loading (toda la pantalla) */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            <p className="mt-4 text-lg font-medium text-gray-700">Procesando tu registro...</p>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row w-full max-w-5xl shadow-xl rounded-2xl overflow-hidden">
         <div className="bg-white p-8 w-full md:w-auto md:min-w-[400px]">
           <h2 className="text-2xl font-semibold text-secondary text-center mb-1">
@@ -219,36 +231,34 @@ export default function RegisterProviderForm() {
             </div>
 
             <div>
-  <label className="block text-sm font-medium mb-2">
-    Especialidades (selecciona al menos una)
-  </label>
-  <div className="grid grid-cols-1 gap-2">
-    {specialties.map((spec) => (
-      <label key={spec} className="inline-flex items-center space-x-2">
-        <input
-          type="checkbox"
-          value={spec}
-          {...register("specialty", {
-            required: "Selecciona al menos una especialidad",
-          })}
-          className="rounded border-gray-300 text-primary focus:ring-primary"
-        />
-        <span>{spec}</span>
-      </label>
-    ))}
-  </div>
-  {errors.specialty && (
-    <p className="text-red-500 text-sm mt-1">
-      {errors.specialty.message}
-    </p>
-  )}
-</div>
-
-            {/* --- SUBMIT --- */}
+              <label className="block text-sm font-medium mb-2">
+                Especialidades (selecciona al menos una)
+              </label>
+              <div className="grid grid-cols-1 gap-2">
+                {specialties.map((spec) => (
+                  <label key={spec} className="inline-flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      value={spec}
+                      {...register("specialty", {
+                        required: "Selecciona al menos una especialidad",
+                      })}
+                      className="rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <span>{spec}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.specialty && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.specialty.message}
+                </p>
+              )}
+            </div>
 
             <button
               type="submit"
-              disabled={!isValid}
+              disabled={!isValid || isLoading}
               className={`w-full px-4 py-2 rounded-full text-sm border transition ${
                 isValid
                   ? "bg-primary text-white border-primary hover:bg-secondary"

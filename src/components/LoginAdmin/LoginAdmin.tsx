@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -48,13 +49,17 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      
       <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-80">
-        <h2 className="text-xl font-bold mb-4 text-center">Login Admin</h2>
+        <div className="flex justify-center">
+          <Image src="/logo-png-vitta.png" alt="Logo Vitta" width={80} height={80} priority />
+        </div>
+        <h2 className="title2 text-center">Login Admin</h2>
         {error && <p className="text-red-500 mb-2 text-sm">{error}</p>}
         <input
           type="email"
           placeholder="Email"
-          className="w-full mb-2 p-2 border rounded"
+          className="input-form mb-4 p-2"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -62,7 +67,7 @@ export default function AdminLoginPage() {
         <input
           type="password"
           placeholder="Contraseña"
-          className="w-full mb-4 p-2 border rounded"
+          className="input-form mb-4 p-2"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -70,7 +75,7 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className={`w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition ${
+          className={`w-full bg-emerald-600 text-white p-2 rounded hover:bg-emerald-800 transition ${
             isLoading ? 'opacity-75 cursor-not-allowed' : ''
           }`}
         >

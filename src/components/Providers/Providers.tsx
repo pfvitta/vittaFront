@@ -1,5 +1,4 @@
 'use client'
-
 import { useProviders } from '@/context/ProvidersContext';
 import CardProvider from "../CardProvider/CardProvider";
 import { useEffect, useState } from 'react';
@@ -8,8 +7,10 @@ function Providers() {
   const { providers, loading, error, refreshProviders } = useProviders();
   const [hasHydrated, setHasHydrated] = useState(false);
 
-  // Filtramos solo los providers con rol 'provider'
-  const filteredProviders = providers.filter(provider => provider.role === 'provider');
+  // Filtramos solo los providers con rol 'provider' Y status 'Active'
+  const filteredProviders = providers.filter(provider => 
+    provider.role === 'provider' && provider.status === 'Active'
+  );
 
   useEffect(() => {
     if (filteredProviders.length === 0 && !loading) {
@@ -70,8 +71,8 @@ function Providers() {
 
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-10">
+      
       <div className="max-w-4xl text-center">
-        {/* <h1 className='title1'>Nuestros profesionales</h1> */}
         <h2 className="text-2xl font-bold text-primary mb-2">Elige al nutricionista ideal para ti</h2>
         <p className="text-secondary mb-4">
           En Vitta, conectamos personas con profesionales de la nutrición certificados en distintas especialidades como veganismo, diabetes, obesidad y más.
@@ -81,8 +82,6 @@ function Providers() {
           Por ahora, explora nuestros perfiles y encuentra el especialista que más se adapte a ti.
         </p>
       </div>
-
-      
 
       {filteredProviders.map((provider) => (
         <CardProvider

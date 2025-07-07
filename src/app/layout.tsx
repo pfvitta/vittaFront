@@ -9,9 +9,6 @@ import { Auth0Provider } from "@auth0/nextjs-auth0" // 👈 Importa el nuevo pro
 export const metadata: Metadata = {
   title: "Vitta",
   description: "Aplicación de salud y bienestar – Proyecto Final",
-  icons: {
-    icon: "/logo-png-vitta.png",
-  },
 };
 
 export default function RootLayout({
