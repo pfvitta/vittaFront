@@ -45,19 +45,23 @@ export const getProviders = async (): Promise<Provider[]> => {
       status: provider.status,
       createdAt: provider.createdAt,
       role: provider.role,
-      professionalProfile: provider.professionalProfile,
       imageUrl: provider.imageUrl || provider.file?.imgUrl || '/Avatar.jpg',
       file: provider.file,
-      specialty: provider.professionalProfile?.specialty || [],
-      biography: provider.professionalProfile?.biography || 'Descripción no disponible',
+      professionalProfile: {
+        id: provider.professionalProfile?.id,
+        biography: provider.professionalProfile?.biography || 'Descripción no disponible',
+        experience: provider.professionalProfile?.experience || '',
+        licenseNumber: provider.professionalProfile?.licenseNumber || '',
+        specialty: provider.professionalProfile?.specialty || [],
+        verified: provider.professionalProfile?.verified,
+        verifiedBy: provider.professionalProfile?.verifiedBy || null,
+      },
     }));
   } catch (err) {
     console.error('Error fetching providers:', err);
     throw err;
   }
 };
-
-
 
 
 export const getProviderById = async (id: string): Promise<Provider> => {
@@ -73,6 +77,7 @@ export const getProviderById = async (id: string): Promise<Provider> => {
     }
 
     const provider = await res.json();
+    const profile = provider.professionalProfile || {};
 
     return {
       id: provider.id,
@@ -88,13 +93,13 @@ export const getProviderById = async (id: string): Promise<Provider> => {
       imageUrl: provider.imageUrl || provider.avatarUrl || provider.file?.imgUrl || '/Avatar.jpg',
       file: provider.file,
       professionalProfile: {
-        id: provider.professionalProfile?.id,
-        biography: provider.professionalProfile?.biography || '',
-        experience: provider.professionalProfile?.experience || '',
-        licenseNumber: provider.professionalProfile?.licenseNumber || '',
-        specialty: provider.professionalProfile?.specialty || [],
-        verified: provider.professionalProfile?.verified,
-        verifiedBy: provider.professionalProfile?.verifiedBy || null,
+        id: profile.id,
+        biography: profile.biography || 'Descripción no disponible',
+        experience: profile.experience || '',
+        licenseNumber: profile.licenseNumber || '',
+        specialty: profile.specialty || [],
+        verified: profile.verified,
+        verifiedBy: profile.verifiedBy || null,
       },
     };
   } catch (err) {

@@ -77,7 +77,7 @@ function Providers() {
           En Vitta, conectamos personas con profesionales de la nutrición certificados en distintas especialidades como veganismo, diabetes, obesidad y más.
           Próximamente podrás filtrar por tus objetivos, leer reseñas de pacientes reales y agendar con un clic.
         </p>
-        <p className="text-primary font-semibold">
+        <p className="text-secondary font-semibold">
           Por ahora, explora nuestros perfiles y encuentra el especialista que más se adapte a ti.
         </p>
       </div>
