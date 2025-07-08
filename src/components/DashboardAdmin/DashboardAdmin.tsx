@@ -24,7 +24,9 @@ export default function AdminDashboard() {
       }
 
       const data: Provider[] = await res.json();
-      setProfessionals(data);
+      // Filtrar solo los usuarios con rol 'provider'
+      const providers = data.filter(user => user.role === 'provider');
+      setProfessionals(providers);
     } catch (err) {
       console.error('Error:', err);
       setError('Error al cargar los profesionales');
