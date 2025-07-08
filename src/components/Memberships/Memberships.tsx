@@ -54,7 +54,7 @@ const Memberships = () => {
           </div>
 
           <div className="mb-6">
-            <p className="text-2xl font-bold text-primary">$50.000</p>
+            <p className="text-2xl font-bold text-primary">$49.99</p>
             <p className="text-sm text-primary">por mes</p>
           </div>
 
