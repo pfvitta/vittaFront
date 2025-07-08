@@ -17,21 +17,22 @@ export default function SuccessPage() {
     const fetchUntilUpdated = async (retries = 6, delay = 1000) => {
       for (let i = 0; i < retries; i++) {
         try {
-          const res = await fetch('/api/session', {
-            credentials: 'include',
-          });
-          const data = await res.json();
+          const sessionRes = await fetch('/api/session');
+          const session = await sessionRes.json();
 
-          if (res.ok && data?.user) {
-            setUser(data.user);
-            console.log('[SuccessPage] Usuario actualizado después del pago:', data.user);
+          const userEmail = session?.user?.email;
+          if (!userEmail) break;
 
+          const userRes = await fetch(`http://localhost:4000/users/by-email/${userEmail}`);
+          const fullUser = await userRes.json();
+          console.log('[SuccessPage] Usuario actualizado después del pago:', fullUser);
 
-            if (data.user.membership?.status === 'Active') {
-              setMembershipConfirmed(true);
-              router.push(previousPath);
-              return;
-            }
+          setUser(fullUser);
+
+          if (fullUser.membership?.status === 'Active') {
+            setMembershipConfirmed(true);
+            router.push(previousPath);
+            return;
           }
         } catch (error) {
           console.error('❌ Error al verificar membresía activa:', error);
@@ -39,7 +40,6 @@ export default function SuccessPage() {
         await new Promise(res => setTimeout(res, delay));
       }
 
-      // Si no se logró confirmar membresía
       setMembershipConfirmed(false);
       router.push(previousPath);
     };

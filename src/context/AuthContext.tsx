@@ -40,7 +40,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const data = await res.json();
           console.log('[SESSION] Data:', data);
 
-          if (data?.user) {
+          if (data?.user?.email) {
+            // Paso 1: verificar si existe el usuario en backend
             const existsRes = await fetch(
               `http://localhost:4000/users/exists/${data.user.email}`
             );
@@ -64,20 +65,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               console.log('[SYNC] Usuario creado');
             }
 
+            // Paso 2: obtener usuario completo (con membresía)
             const userRes = await fetch(
               `http://localhost:4000/users/by-email/${data.user.email}`
             );
 
             if (!userRes.ok) {
-              throw new Error('No se pudo obtener el usuario');
+              throw new Error('No se pudo obtener el usuario completo');
             }
 
-            const text = await userRes.text();
-            if (!text) {
-              throw new Error('La respuesta del backend está vacía');
-            }
-
-            const fullUser = JSON.parse(text);
+            const fullUser = await userRes.json();
             console.log('[AUTH] Usuario:', fullUser);
             console.log('[AUTH] Membership:', fullUser.membership);
 

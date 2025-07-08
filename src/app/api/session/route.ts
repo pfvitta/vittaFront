@@ -12,6 +12,5 @@ export async function GET() {
   return NextResponse.json({
     user: session.user,
     role: session.user['https://vitta.com/roles'] ?? 'user',
-    membership: session.user['https://vitta.com/membership'] ?? null,
   });
 }
