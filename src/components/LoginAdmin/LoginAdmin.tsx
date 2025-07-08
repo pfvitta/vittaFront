@@ -8,6 +8,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false); // Nuevo estado para controlar el login exitoso
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -28,29 +29,40 @@ export default function AdminLoginPage() {
       console.log('Respuesta del login:', data);
 
       if (!res.ok) {
-        // Usa el mensaje de error del backend si está disponible
         throw new Error(data.message || 'Credenciales incorrectas');
       }
 
-      // Verificación simplificada - solo comprobamos que la respuesta sea exitosa
-      // Guardamos el email en localStorage (opcional)
+      // Guardamos el email en localStorage
       localStorage.setItem('adminEmail', email);
       
-      // Redirigimos al dashboard
-      router.push('/pepita-flores/dashboard-admin');
+      // Marcamos el login como exitoso
+      setLoginSuccess(true);
+      
+      // Esperamos 1 segundo para mostrar el loading antes de redirigir
+      setTimeout(() => {
+        router.push('/pepita-flores/dashboard-admin');
+      }, 1000);
 
     } catch (err: any) {
       console.error('Error en el login:', err);
       setError(err.message || 'Credenciales incorrectas');
-    } finally {
       setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      
-      <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-80">
+      {/* Overlay de loading para login exitoso */}
+      {loginSuccess && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            <p className="mt-4 text-lg font-medium text-gray-700">Iniciando sesion...</p>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-80 relative z-0">
         <div className="flex justify-center">
           <Image src="/logo-png-vitta.png" alt="Logo Vitta" width={80} height={80} priority />
         </div>
@@ -74,9 +86,9 @@ export default function AdminLoginPage() {
         />
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || loginSuccess} // Deshabilitar también durante el redirect
           className={`w-full bg-emerald-600 text-white p-2 rounded hover:bg-emerald-800 transition ${
-            isLoading ? 'opacity-75 cursor-not-allowed' : ''
+            isLoading || loginSuccess ? 'opacity-75 cursor-not-allowed' : ''
           }`}
         >
           {isLoading ? 'Verificando...' : 'Ingresar'}

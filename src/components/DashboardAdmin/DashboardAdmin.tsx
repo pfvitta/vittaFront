@@ -1,12 +1,28 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Provider } from '@/types/Provider';
+import { useRouter } from 'next/navigation'; // Importamos useRouter
 
 export default function AdminDashboard() {
+  const router = useRouter(); // Instancia del router
   const [professionals, setProfessionals] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoggingOut, setIsLoggingOut] = useState(false); // Nuevo estado para controlar el logout
+
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    setIsLoggingOut(true); // Activar el estado de logout
+    // Elimina el token de autenticación
+    localStorage.removeItem('token');
+    
+    // Simulamos un pequeño delay para que se vea el loading
+    setTimeout(() => {
+      // Redirige al login de admin
+      router.push('/pepita-flores');
+    }, 1000);
+  };
 
   const fetchData = async () => {
     try {
@@ -24,8 +40,14 @@ export default function AdminDashboard() {
       }
 
       const data: Provider[] = await res.json();
-      // Filtrar solo los usuarios con rol 'provider'
-      const providers = data.filter(user => user.role === 'provider');
+      // Filtrar solo proveedores y asegurar status 'Inactive' por defecto
+      const providers = data
+        .filter(user => user.role === 'provider')
+        .map(provider => ({
+          ...provider,
+          status: provider.status || 'Inactive' // Valor por defecto
+        }));
+      
       setProfessionals(providers);
     } catch (err) {
       console.error('Error:', err);
@@ -84,7 +106,25 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-8 relative"> {/* Añadido relative para posicionamiento */}
+      {/* Overlay de loading para cerrar sesión */}
+      {isLoggingOut && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            <p className="mt-4 text-lg font-medium text-gray-700">Cerrando sesión...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Botón de cerrar sesión */}
+      <button
+        onClick={handleLogout}
+        className="absolute top-8 right-8 bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition"
+      >
+        Cerrar Sesión
+      </button>
+
       <h1 className="title1">Gestión de Profesionales</h1>
       
       {error && (
