@@ -124,9 +124,9 @@ export default function DashboardUser() {
                   </>
                 ) : (
                   <>
-                    <h2 className="title2">Membresía activa</h2>
+                    <h2 className="text-primary font-semibold">Membresía Activa</h2>
                     <p className="text-gray-500 text-sm mt-2 mb-1">Plan Premium</p>
-                    <p className="text-gray-500 text-sm">Incluye dos sesiones al mes</p>
+                    <p className="text-gray-500 text-sm">Incluye 2 sesiones al mes</p>
                     <button
                       className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition mt-4"
                       onClick={() => router.push('/providers')}
