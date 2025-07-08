@@ -39,7 +39,7 @@ export default function ProviderProfile() {
     if (!hasMembership) {
       router.push(`/memberships?redirectTo=/providers/${id}`);
     } else {
-      router.push(`/appointments/create?providerId=${id}`);
+      router.push(`/providers/${id}/appointments`);
     }
   };
 

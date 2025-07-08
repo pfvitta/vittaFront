@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, User, FileText, Calendar } from 'lucide-react';
+import { LogOut, User, FileText } from 'lucide-react';
 import { ReactNode } from 'react';
 
 interface SidebarProviderProps {
@@ -29,12 +29,6 @@ export default function SidebarProvider({ children }: SidebarProviderProps) {
               <button className="btn-dashboard">
                 <FileText className="mr-3 h-4 w-4" />
                 Mis turnos
-              </button>
-            </Link>
-            <Link href="/dashboard/provider/schedule">
-              <button className="btn-dashboard">
-                <Calendar className="mr-3 h-4 w-4" />
-                Disponibilidad
               </button>
             </Link>
             <div className="border-t border-gray-200 my-4"></div>
