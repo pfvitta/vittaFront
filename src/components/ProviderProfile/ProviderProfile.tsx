@@ -123,9 +123,9 @@ export default function ProviderProfile() {
       {/* Membresía (solo información) */}
       <div className="md:col-span-1 bg-gray-50 p-6 rounded-xl shadow-md">
         <h2 className="text-lg font-bold text-secondary mb-1">Membresía</h2>
-        <p className="text-green-600 font-bold text-lg">$50.000 c/ mes</p>
+        <p className="text-green-600 font-bold text-lg">$49.99 c/ mes</p>
         <p className="text-sm text-gray-700 mt-1">
-          Incluye 4 sesiones al mes para consultas (1 semanal), controles o planes alimenticios.
+          Incluye 2 sesiones al mes para consultas, controles o planes alimenticios.
         </p>
       </div>
     </div>

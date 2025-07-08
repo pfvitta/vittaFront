@@ -1,18 +1,81 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isWeekend,
+} from 'date-fns';
+import { es } from 'date-fns/locale';
+import {
+  getAvailableHours,
+  createAppointment,
+} from '@/services/appointmentService';
 
 export default function AppointmentPage() {
-  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [availableHours, setAvailableHours] = useState<string[]>([]);
   const [selectedHour, setSelectedHour] = useState<string | null>(null);
+  const [loadingHours, setLoadingHours] = useState(false);
+  const searchParams = useSearchParams();
 
-  const days = ['Lun 14', 'Mar 15', 'Mié 16', 'Jue 17', 'Vie 18'];
-  const hours = ['08:00 hrs.', '09:00 hrs.', '10:00 hrs.', '11:00 hrs.', '13:00 hrs.', '14:00 hrs.', '15:00 hrs.', '16:00 hrs.', '17:00 hrs.'];
+  const providerId = searchParams.get('providerId');
+  const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
 
-  const handleSubmit = () => {
-    if (!selectedDay || !selectedHour) return alert('Seleccioná día y hora.');
-    // Acá iría la lógica para enviar al backend
-    alert(`Turno agendado: ${selectedDay} a las ${selectedHour}`);
+  const today = new Date();
+  const days = eachDayOfInterval({
+    start: startOfMonth(today),
+    end: endOfMonth(today),
+  }).filter((day) => !isWeekend(day));
+
+  useEffect(() => {
+    if (!selectedDate || !providerId) return;
+
+    const fetchAvailable = async () => {
+      setLoadingHours(true);
+      try {
+        const isoDate = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
+        const hours = await getAvailableHours({
+          professionalId: providerId,
+          date: isoDate,
+        });
+        setAvailableHours(hours);
+      } catch (error) {
+        console.error('Error al obtener horarios disponibles', error);
+        setAvailableHours([]);
+      } finally {
+        setLoadingHours(false);
+      }
+    };
+
+    fetchAvailable();
+  }, [selectedDate, providerId]);
+
+  const handleSubmit = async () => {
+    if (!selectedDate || !selectedHour || !userId || !providerId) {
+      alert('Faltan datos para agendar el turno.');
+      return;
+    }
+
+    try {
+      const isoDate = selectedDate.toISOString().split('T')[0];
+      await createAppointment({
+        userId,
+        professionalId: providerId,
+        date: isoDate,
+        time: selectedHour,
+        status: 'pendiente',
+      });
+
+      alert('Turno creado con éxito');
+      // Aquí podrías redirigir al dashboard o mostrar una confirmación
+    } catch (error) {
+      console.error('Error al crear el turno:', error);
+      alert('Error al agendar el turno');
+    }
   };
 
   return (
@@ -22,57 +85,67 @@ export default function AppointmentPage() {
           Agendá tu cita con un nutricionista
         </h1>
 
-        <p className="text-gray-600 text-center">
-          Seleccioná un día y horario disponible. Las citas son por videollamada.
-        </p>
-
         <div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">Día disponible - Mes de Julio</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-2">
+            Seleccioná un día (mes actual)
+          </h2>
           <div className="flex gap-2 overflow-x-auto">
-            {days.map((day, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedDay(day)}
-                className={`px-4 py-2 rounded-full border ${
-                  selectedDay === day
-                    ? 'bg-secondary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {day}
-              </button>
-            ))}
+            {days.map((day) => {
+              const formatted = format(day, 'dd/MM', { locale: es });
+              const isSelected =
+                selectedDate?.toDateString() === day.toDateString();
+
+              return (
+                <button
+                  key={day.toISOString()}
+                  onClick={() => {
+                    setSelectedDate(day);
+                    setSelectedHour(null);
+                  }}
+                  className={`px-4 py-2 rounded-full border text-sm ${
+                    isSelected
+                      ? 'bg-secondary text-white'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {formatted}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        <div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">Horario</h2>
-          <div className="grid grid-cols-3 gap-2">
-            {hours.map((hour, idx) => (
-              <button
-                key={idx}
-                onClick={() => setSelectedHour(hour)}
-                className={`px-3 py-2 rounded-md text-sm border ${
-                  selectedHour === hour
-                    ? 'bg-secondary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {hour}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="text-sm text-gray-600 space-y-1">
-          <p>📹 Las citas son por videollamada.</p>
-          <p>⏰ La tolerancia es de 10 minutos.</p>
-          <p>🎤 Asegurate de tener micrófono y cámara.</p>
-        </div>
+        {loadingHours ? (
+          <p className="text-center text-gray-500">Cargando horarios...</p>
+        ) : (
+          selectedDate && (
+            <div>
+              <h2 className="text-sm font-semibold text-gray-700 mb-2">
+                Horarios disponibles
+              </h2>
+              <div className="grid grid-cols-3 gap-2">
+                {availableHours.map((hour) => (
+                  <button
+                    key={hour}
+                    onClick={() => setSelectedHour(hour)}
+                    className={`px-3 py-2 rounded-md text-sm border ${
+                      selectedHour === hour
+                        ? 'bg-secondary text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                  >
+                    {hour}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+        )}
 
         <button
           onClick={handleSubmit}
-          className="w-full mt-4 bg-secondary text-white py-3 rounded-full font-medium hover:bg-primary transition"
+          disabled={!selectedHour}
+          className="w-full mt-4 bg-secondary text-white py-3 rounded-full font-medium hover:bg-primary transition disabled:opacity-50"
         >
           Confirmar cita
         </button>

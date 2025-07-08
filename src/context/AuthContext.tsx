@@ -67,7 +67,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const userRes = await fetch(
               `http://localhost:4000/users/by-email/${data.user.email}`
             );
-            const fullUser = await userRes.json();
+
+            if (!userRes.ok) {
+              throw new Error('No se pudo obtener el usuario');
+            }
+
+            const text = await userRes.text();
+            if (!text) {
+              throw new Error('La respuesta del backend está vacía');
+            }
+
+            const fullUser = JSON.parse(text);
+            console.log('[AUTH] Usuario:', fullUser);
+            console.log('[AUTH] Membership:', fullUser.membership);
 
             setUser(fullUser);
             setRole(data.role);
@@ -76,6 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
 
+        // fallback al localStorage
         const storedUser = localStorage.getItem('user');
         const token = localStorage.getItem('token');
         const storedRole = localStorage.getItem('role');
@@ -147,5 +160,6 @@ export const useAuth = () => {
   }
   return context;
 };
+
 
   
