@@ -1,84 +1,64 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react";
-import { LogOut, User, Mail, MapPin, Phone, Calendar, CreditCard, Briefcase, Award, FileText } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
-import { handleImageUpload } from "@/services/uploadImageService";
+import { useState, useEffect } from 'react';
+import { Mail, MapPin, Phone, Calendar, CreditCard, Award, FileText, User } from 'lucide-react';
+import Image from 'next/image';
+import { useAuth } from '@/context/AuthContext';
+import { handleImageUpload } from '@/services/uploadImageService';
+import { Provider } from '@/types/Provider';
+import { useProviders } from '@/context/ProvidersContext';
+import SidebarProvider from '@/components/SidebarProvider/SidebarProvider';
+import {toast} from 'react-hot-toast';
 
 export default function DashboardProvider() {
-  const { user, role, isAuthenticated, setUser } = useAuth();
+  const { refreshProviders } = useProviders();
+  const { user, role, setUser } = useAuth();
   const [loading, setLoading] = useState(true);
-  const provider = role === "provider" ? user : null;
-  console.log(isAuthenticated)
+  const provider = role === 'provider' ? (user as Provider) : null;
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const savedRole = localStorage.getItem("role");
+    const token = localStorage.getItem('token');
+    const savedRole = localStorage.getItem('role');
 
-    if (!token || savedRole !== "provider") {
-      window.location.href = "/login";
+    if (!token || savedRole !== 'provider') {
+      window.location.href = '/login';
     } else {
       setLoading(false);
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("user");
-    localStorage.removeItem("role");
-    window.location.href = "/login";
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !provider) return;
+
+    try {
+      const result = await handleImageUpload(file, provider.id);
+      if (result?.imgUrl) {
+        const updated = {
+          ...provider,
+          file: { ...(provider.file || {}), imgUrl: result.imgUrl },
+        };
+        setUser(updated);
+        localStorage.setItem('user', JSON.stringify(updated));
+        refreshProviders();
+      }
+    } catch (error) {
+      toast.error('No se pudo subir la imagen. Verifica el formato o el tamaño.');
+      console.error('Error al subir la imagen:', error);
+    }
   };
 
   if (loading) {
-    return (
-      <div className="text-center py-10 text-gray-500">
-        Cargando...
-      </div>
-    );
+    return <div className="text-center py-10 text-gray-500">Cargando...</div>;
   }
 
   if (!provider) {
-    return (
-      <div className="text-center py-10 text-gray-500">
-        Redirigiendo...
-      </div>
-    );
+    return <div className="text-center py-10 text-gray-500">Redirigiendo...</div>;
   }
 
   return (
-    <div className="flex p-5">
-      {/* Sidebar */}
-      <aside className="bg-gray-100 m-1 rounded-xl border-gray-200 min-h-screen">
-        <div className="p-4">
-          <nav className="space-y-2">
-            <Link href="/dashboard/provider">
-              <button className="btn-dashboard">
-                <User className="mr-3 h-4 w-4" />
-                Mi perfil
-              </button>
-            </Link>
-            <button className="btn-dashboard">
-              <FileText className="mr-3 h-4 w-4" />
-              Mis turnos
-            </button>
-            <button className="btn-dashboard">
-              <Briefcase className="mr-3 h-4 w-4" />
-              Mis pacientes
-            </button>
-            <div className="border-t border-gray-200 my-4"></div>
-            <button className="btn-dashboard" onClick={handleLogout}>
-              <LogOut className="mr-3 h-4 w-4" />
-              Cerrar sesión
-            </button>
-          </nav>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-2 p-1">
+    <SidebarProvider>
+      <div className="flex-1 p-1">
         <div className="max-w-5xl bg-gray-100 rounded-xl p-9 mx-auto">
           <div className="mb-8">
             <h1 className="title1">Bienvenida/o {provider.name}!</h1>
@@ -88,12 +68,11 @@ export default function DashboardProvider() {
           </div>
 
           <div className="grid gap-3 md:grid-cols-4">
-            {/* Profile Card */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-10 text-center">
                 <div className="flex justify-center mb-4">
                   <Image
-                    src={provider.file?.imgUrl || "/Avatar.jpg"}
+                    src={provider.file?.imgUrl || '/Avatar.jpg'}
                     alt="Foto de perfil"
                     width={150}
                     height={150}
@@ -103,8 +82,8 @@ export default function DashboardProvider() {
                 <h2 className="title2">{provider.name}</h2>
                 <p className="text-gray-500 text-sm mb-4">
                   {provider.professionalProfile?.verified
-                    ? "Profesional verificado"
-                    : "Profesional no verificado"}
+                    ? 'Profesional verificado'
+                    : 'Profesional no verificado'}
                 </p>
                 <button className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">
                   Editar Perfil
@@ -116,33 +95,12 @@ export default function DashboardProvider() {
                     type="file"
                     accept="image/*"
                     hidden
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (file && provider && "id" in provider) {
-                        try {
-                          const result = await handleImageUpload(file, provider.id);
-
-                          if (result?.imgUrl) {
-                            const updated = {
-                              ...provider,
-                              file: { ...(provider.file || {}), imgUrl: result.imgUrl }
-                            };
-                            setUser(updated);
-                            localStorage.setItem("user", JSON.stringify(updated));
-                          }
-                          
-                        } catch (error) {
-                          alert("No se pudo subir la imagen. Verifica el formato o el tamaño.");
-                          console.error("Error al subir la imagen:", error);
-                        }
-                      }
-                    }}
+                    onChange={handleImageChange}
                   />
                 </label>
               </div>
             </div>
 
-            {/* Información Personal */}
             <div className="md:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6">
                 <div className="mb-4 text-center">
@@ -166,26 +124,24 @@ export default function DashboardProvider() {
               </div>
             </div>
 
-            {/* Biografía */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               <div className="p-6">
                 <h2 className="title2 text-center">Biografía</h2>
                 <p className="text-gray-500 text-sm mt-2">
-                  {provider.professionalProfile?.biography || "No hay biografía disponible"}
+                  {provider.professionalProfile?.biography || 'No hay biografía disponible'}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Sección de Turnos */}
           <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-6">
               <h2 className="title2 text-center mb-4">Mis Turnos</h2>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 }
 
@@ -196,9 +152,11 @@ function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string
         {icon}
         <div>
           <p className="text-sm font-medium text-gray-500">{label}</p>
-          <p className="text-base text-secondary">{value || "No disponible"}</p>
+          <p className="text-base text-secondary">{value || 'No disponible'}</p>
         </div>
       </div>
     </div>
   );
 }
+
+

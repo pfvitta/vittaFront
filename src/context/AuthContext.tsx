@@ -7,85 +7,93 @@ import {
   ReactNode,
   useContext,
 } from 'react';
-
-type UserData = {
-  id: string;
-  name: string;
-  email: string;
-  picture?: string;
-  city?: string;
-  phone?: string;
-  dni?: string;
-  dob?: string;
-  avatarUrl?: string;
-  role: string;
-  professionalProfile?: {
-    biography: string;
-    experience: string;
-    licenseNumber: string;
-    specialty: string[];
-    verified: boolean;
-  };
-  file?: {
-    id?: string;
-    filename?: string;
-    mimetype?: string;
-    imgUrl?: string;
-  };
-};
+import { UserData } from '../types/User';
+import { Provider } from '../types/Provider';
 
 type AuthContextType = {
-  user: UserData | null;
+  user: UserData | Provider | null;
   role: string | null;
   isAuthenticated: boolean;
   loading: boolean;
   logout: () => void;
   login: (user: UserData, token: string, role: string) => void;
-  setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
+  setUser: React.Dispatch<React.SetStateAction<UserData | Provider | null>>;
+  hasMembership: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<UserData | null>(null);
+  const [user, setUser] = useState<UserData | Provider | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [hasMembership, setHasMembership] = useState<boolean>(false);
 
-  // Verificar tanto la sesión de Auth0 como el localStorage
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // 1. Primero verificar la sesión de Auth0
         const res = await fetch('/api/session');
         console.log('[SESSION] Status:', res.status);
-        
+
         if (res.ok) {
           const data = await res.json();
           console.log('[SESSION] Data:', data);
-          
-          if (data?.user) {
-            setUser(data.user);
+
+          if (data?.user?.email) {
+            // Paso 1: verificar si existe el usuario en backend
+            const existsRes = await fetch(
+              `http://localhost:4000/users/exists/${data.user.email}`
+            );
+
+            if (existsRes.status === 404) {
+              console.log('[SYNC] Usuario no existe. Creando...');
+              await fetch('http://localhost:4000/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: data.user.name || 'Usuario',
+                  email: data.user.email,
+                  password: 'auth0',
+                  phone: '0000000000',
+                  dni: '00000000',
+                  city: 'Sin definir',
+                  dob: '2000-01-01',
+                  role: data.role || 'user',
+                }),
+              });
+              console.log('[SYNC] Usuario creado');
+            }
+
+            // Paso 2: obtener usuario completo (con membresía)
+            const userRes = await fetch(
+              `http://localhost:4000/users/by-email/${data.user.email}`
+            );
+
+            if (!userRes.ok) {
+              throw new Error('No se pudo obtener el usuario completo');
+            }
+
+            const fullUser = await userRes.json();
+            console.log('[AUTH] Usuario:', fullUser);
+            console.log('[AUTH] Membership:', fullUser.membership);
+
+            setUser(fullUser);
             setRole(data.role);
             setIsAuthenticated(true);
-            setLoading(false);
             return;
           }
         }
 
-        // 2. Si no hay sesión de Auth0, verificar localStorage (autenticación local)
+        // fallback al localStorage
         const storedUser = localStorage.getItem('user');
         const token = localStorage.getItem('token');
         const storedRole = localStorage.getItem('role');
-        
-        console.log(isAuthenticated, "se esta autenticando");
-        console.log(storedUser, token, storedRole, "storedUser, token, storedRole");
-        
+
         if (storedUser && token && storedRole) {
           setUser(JSON.parse(storedUser));
           setIsAuthenticated(true);
           setRole(storedRole);
-          console.log(isAuthenticated, "se esta autenticando bien");
         }
       } catch (err) {
         console.error('[AUTH] Error:', err);
@@ -95,7 +103,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     checkAuth();
-  }, [isAuthenticated]);
+  }, []);
+
+  useEffect(() => {
+    if (role === 'user' && (user as UserData)?.membership?.status === 'Active') {
+      setHasMembership(true);
+    } else {
+      setHasMembership(false);
+    }
+  }, [user, role]);
 
   const login = (user: UserData, token: string, role: string) => {
     console.log('Guardando en localStorage:', { token });
@@ -109,13 +125,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    // Limpiar tanto Auth0 como localStorage
     localStorage.clear();
     setUser(null);
     setRole(null);
     setIsAuthenticated(false);
-    
-    // Redirigir al logout de Auth0
     window.location.href = '/auth/logout';
   };
 
@@ -129,6 +142,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         login,
         setUser,
+        hasMembership,
       }}
     >
       {children}
@@ -138,9 +152,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context)
+  if (!context) {
     throw new Error('useAuth debe usarse dentro de un <AuthProvider>');
+  }
   return context;
 };
+
 
   

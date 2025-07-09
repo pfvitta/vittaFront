@@ -18,7 +18,7 @@ export const registerProvider = async (data: RegisterProviderValues) => {
   
 
 // services/providerService.ts
-import { Provider } from '@/context/ProvidersContext';
+import { Provider } from '../types/Provider';
 
 export const getProviders = async (): Promise<Provider[]> => {
   try {
@@ -33,7 +33,7 @@ export const getProviders = async (): Promise<Provider[]> => {
     }
 
     const data = await res.json();
-    
+
     return data.map((provider: Provider) => ({
       id: provider.id,
       name: provider.name,
@@ -45,14 +45,65 @@ export const getProviders = async (): Promise<Provider[]> => {
       status: provider.status,
       createdAt: provider.createdAt,
       role: provider.role,
-      membership: provider.membership,
-      professionalProfile: provider.professionalProfile,
-      avatarUrl: provider.avatarUrl,
-      specialty: provider.specialty || [], // Usa el array de especialidades del perfil profesional
-      biography: provider.biography || provider.professionalProfile?.biography // Usa la biografía del perfil profesional
+      imageUrl: provider.imageUrl || provider.file?.imgUrl || '/Avatar.jpg',
+      file: provider.file,
+      professionalProfile: {
+        id: provider.professionalProfile?.id,
+        biography: provider.professionalProfile?.biography || 'Descripción no disponible',
+        experience: provider.professionalProfile?.experience || '',
+        licenseNumber: provider.professionalProfile?.licenseNumber || '',
+        specialty: provider.professionalProfile?.specialty || [],
+        verified: provider.professionalProfile?.verified,
+        verifiedBy: provider.professionalProfile?.verifiedBy || null,
+      },
     }));
   } catch (err) {
     console.error('Error fetching providers:', err);
+    throw err;
+  }
+};
+
+
+export const getProviderById = async (id: string): Promise<Provider> => {
+  try {
+    const res = await fetch(`http://localhost:4000/users/${id}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || "Error al obtener proveedor");
+    }
+
+    const provider = await res.json();
+    const profile = provider.professionalProfile || {};
+
+    return {
+      id: provider.id,
+      name: provider.name,
+      email: provider.email,
+      phone: provider.phone,
+      dni: provider.dni,
+      city: provider.city,
+      dob: provider.dob,
+      role: provider.role,
+      status: provider.status,
+      createdAt: provider.createdAt,
+      imageUrl: provider.imageUrl || provider.avatarUrl || provider.file?.imgUrl || '/Avatar.jpg',
+      file: provider.file,
+      professionalProfile: {
+        id: profile.id,
+        biography: profile.biography || 'Descripción no disponible',
+        experience: profile.experience || '',
+        licenseNumber: profile.licenseNumber || '',
+        specialty: profile.specialty || [],
+        verified: profile.verified,
+        verifiedBy: profile.verifiedBy || null,
+      },
+    };
+  } catch (err) {
+    console.error("Error fetching provider by ID:", err);
     throw err;
   }
 };

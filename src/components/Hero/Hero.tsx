@@ -3,10 +3,28 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 const Hero = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleButtonClick = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 2000); // Loading por 2 segundos
+  };
+
   return (
     <section className="relative flex items-center justify-between max-w-screen-xl mx-auto px-6 py-16 mt-[-2rem]">
+      {/* Overlay de loading */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            <p className="mt-4 text-lg font-medium text-gray-700">Cargando profesionales...</p>
+          </div>
+        </div>
+      )}
+
       {/* Texto */}
       <motion.div
         initial={{ x: -50, opacity: 0 }}
@@ -18,10 +36,13 @@ const Hero = () => {
           Vive con propósito <br /> aliméntate con ciencia
         </h1>
         <p className="text-secondary mt-4">
-          Encuentra psicólogos, terapeutas y coaches verificados para acompañarte en tu camino.
+          Encuentra nutricionistas verificados para acompañarte en tu camino de vida saludable.
         </p>
         <Link href="/providers">
-          <button className="bg-primary text-white px-6 py-3 rounded-full mt-6 hover:bg-secondary transition">
+          <button 
+            onClick={handleButtonClick}
+            className="bg-primary text-white px-6 py-3 rounded-full mt-6 hover:bg-secondary transition"
+          >
             Explorar profesionales
           </button>
         </Link>
@@ -48,8 +69,3 @@ const Hero = () => {
 };
 
 export default Hero;
-
-
-
-
-

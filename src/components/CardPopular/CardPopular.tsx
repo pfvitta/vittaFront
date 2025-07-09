@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext'; 
 import Image from 'next/image';
 import Link from 'next/link';
+import {toast} from 'react-hot-toast';
 
 interface CardPopularProps {
   id: string;
@@ -16,12 +17,14 @@ const CardPopular = ({ id, imageUrl, name  }: CardPopularProps) => {
 
   const handleProtectedClick = () => {
     if (!id) {
-      alert("El ID del profesional no está disponible.");
+      toast.error("El ID del profesional no está disponible.");
       return;
     }
 
     if (!isAuthenticated) {
-      alert("Debes iniciar sesión para ver el perfil del profesional.");
+      toast('Debes iniciar sesión para ver el perfil del profesional.', {
+        icon: '❗',
+      });
       router.push('/login');
       return;
     }

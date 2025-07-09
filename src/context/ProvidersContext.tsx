@@ -1,40 +1,8 @@
-'use client'
+'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { getProviders } from '../services/providerService';
-
-export interface Specialty {
-  id: string;
-  name: string;
-}
-
-export interface ProfessionalProfile {
-  id: string;
-  biography: string;
-  verified: boolean;
-  verifiedBy: string | null;
-  experience: string;
-  licenseNumber: string;
-  specialty: Specialty[];
-}
-
-export interface Provider {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  dni: string;
-  city: string;
-  dob: string;
-  status: string;
-  createdAt: string;
-  role: string;
-  membership: "active" | "inactive";
-  professionalProfile: ProfessionalProfile;
-  avatarUrl?: string;
-  specialty?: Specialty[]; // Añade specialty aquí
-  biography?: string; // Añade biography aquí para acceso directo
-}
+import { getProviders } from '@/services/providerService';
+import { Provider } from '@/types/Provider';
 
 interface ProvidersContextType {
   providers: Provider[];
@@ -60,12 +28,15 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
     setError(null);
     try {
       const data = await getProviders();
-     
-      const normalizedProviders = data.map(provider => ({
+
+      // Aseguramos que todos los providers tengan los campos enriquecidos
+      const normalizedProviders = data.map((provider) => ({
         ...provider,
-        specialty: provider.professionalProfile?.specialty || [], // ✅ Extrae del lugar correcto
-        biography: provider.professionalProfile?.biography || "Descripción no disponible",
-        avatarUrl: provider.avatarUrl || "/default-profile.png"
+        professionalProfile: {
+          ...provider.professionalProfile,
+          specialty: provider.professionalProfile?.specialty || [],
+        },
+        imageUrl: provider.imageUrl || '/default-profile.png',
       }));
 
       setProviders(normalizedProviders);
@@ -73,7 +44,7 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error fetching providers:', err);
-     
+
       const savedProviders = localStorage.getItem('providersData');
       if (savedProviders) {
         try {
@@ -98,7 +69,7 @@ export const ProvidersProvider = ({ children }: { children: React.ReactNode }) =
         providers,
         loading,
         error,
-        refreshProviders: fetchProviders
+        refreshProviders: fetchProviders,
       }}
     >
       {children}
