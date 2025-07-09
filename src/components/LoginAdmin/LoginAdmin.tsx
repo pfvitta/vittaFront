@@ -45,10 +45,15 @@ export default function AdminLoginPage() {
         router.push('/pepita-flores/dashboard-admin');
       }, 1000);
 
-    } catch (err: any) {
+    } catch (err) {
+    if (err instanceof Error) {
       console.error('Error en el login:', err);
       toast.error(err.message || 'Credenciales incorrectas');
-      setIsLoading(false);
+    } else {
+      console.error('Error desconocido en el login:', err);
+      toast.error('Ocurrió un error inesperado');
+    }
+    setIsLoading(false);
     }
   };
 
