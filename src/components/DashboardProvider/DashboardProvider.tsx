@@ -8,6 +8,7 @@ import { handleImageUpload } from '@/services/uploadImageService';
 import { Provider } from '@/types/Provider';
 import { useProviders } from '@/context/ProvidersContext';
 import SidebarProvider from '@/components/SidebarProvider/SidebarProvider';
+import {toast} from 'react-hot-toast';
 
 export default function DashboardProvider() {
   const { refreshProviders } = useProviders();
@@ -42,7 +43,7 @@ export default function DashboardProvider() {
         refreshProviders();
       }
     } catch (error) {
-      alert('No se pudo subir la imagen. Verifica el formato o el tamaño.');
+      toast.error('No se pudo subir la imagen. Verifica el formato o el tamaño.');
       console.error('Error al subir la imagen:', error);
     }
   };

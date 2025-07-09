@@ -6,6 +6,9 @@ import { RegisterProviderValues } from "@/types/forms/RegisterProviders";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
+import {toast} from 'react-hot-toast';
+
+
 
 const defaultValues: RegisterProviderValues = {
   name: "",
@@ -50,16 +53,17 @@ export default function RegisterProviderForm() {
     setIsLoading(true);
     try {
       const response = await registerProvider(data);
-      alert("Registro exitoso");
+      toast.success("Registro exitoso");
       setSubmittedData(response);
       reset();
       router.push("/dashboard/provider");
     } catch (error) {
       console.error(error);
-      alert("Hubo un error al registrar");
+      toast.error("Hubo un error al registrar");
     } finally {
       setIsLoading(false);
     }
+    
   };
 
   return (

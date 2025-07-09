@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import {toast} from 'react-hot-toast';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false); // Nuevo estado para controlar el login exitoso
   const router = useRouter();
+ 
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +31,7 @@ export default function AdminLoginPage() {
       console.log('Respuesta del login:', data);
 
       if (!res.ok) {
-        throw new Error(data.message || 'Credenciales incorrectas');
+        toast.error(data.message || 'Credenciales incorrectas');
       }
 
       // Guardamos el email en localStorage
@@ -45,7 +47,7 @@ export default function AdminLoginPage() {
 
     } catch (err: any) {
       console.error('Error en el login:', err);
-      setError(err.message || 'Credenciales incorrectas');
+      toast.error(err.message || 'Credenciales incorrectas');
       setIsLoading(false);
     }
   };

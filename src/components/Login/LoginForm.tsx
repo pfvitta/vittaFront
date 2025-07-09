@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../../context/AuthContext";
+import {toast} from "react-hot-toast";
 
 type LoginFormValues = {
   email: string;
@@ -38,13 +39,15 @@ export default function Login() {
     try {
       const response = await loginUser(data);
       const { token } = response;
-      if (!token) throw new Error("Falta token en la respuesta del login");
+      if (!token) toast('Falta token en la respuesta del login', {
+        icon: '❗',
+      });
 
       const decoded = jwtDecode<TokenPayload>(token);
       const userId = decoded.sub;
       const role = decoded.roles || "user";
 
-      if (!userId) throw new Error("El token no contiene userId");
+      if (!userId) toast.error("El token no contiene userId");
 
       const user = await getUserById(userId, token);
       login(user, token, role);
@@ -61,7 +64,7 @@ export default function Login() {
       setIsLoggingIn(false);
       const err = error as Error;
       console.error("Login error:", err.message);
-      setServerError(err.message || "Error al iniciar sesión");
+      toast.error(err.message || "Error al iniciar sesión");
     }
   };
 
