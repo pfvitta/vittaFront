@@ -55,57 +55,62 @@ export default async function Home() {
 
 
       {/*----PROFESIONALES MAS FRECUENTES----*/}
-      <h1 className="title1">Profesionales más populares</h1>
-      <section className="grid-cols-3 flex justify-center gap-10 mb-7">
-        {/*CARD 1*/}
-        <div className="bg-white p-4 w-[300px] h-auto">
-          <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
-            <Image
-              src="/FotoPerfilProvider.jpg"
-              alt="Consulta virtual"
-              width={300}
-              height={300}
-              className="w-full h-full object-cover" 
-              priority
-            />
-          </div>
-        <h2 className="title2 text-center">Pepita Flores</h2>
-        <p className="text-gray-600 text-center text-sm mb-4 px-2 py-1">Ver mas...</p>
-      </div>
-      {/*CARD 2*/}
-        <div className="bg-white p-4 w-[300px] h-auto">
-          <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
-            <Image
-              src="/FotoPerfilProvider2.jpg"
-              alt="Consulta virtual"
-              width={300}
-              height={300}
-              className="w-full h-full object-cover"
-              priority
-            />
-          </div>
-        <h2 className="title2 text-center">Pepita Flores</h2>
-        <p className="text-gray-600 text-center text-sm mb-4 px-2 py-1">Ver mas...</p>
-      </div>
-      {/*CARD 3*/}
-        <div className="bg-white p-4 w-[300px] h-auto">
-          <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
-            <Image
-              src="/FotoPerfilProvider3.jpg"
-              alt="Consulta virtual"
-              width={300}
-              height={300}
-              className="w-full h-full object-cover"
-              priority
-            />
-          </div>
-        <h2 className="title2 text-center">Pepita Flores</h2>
-        <p className="text-gray-600 text-center text-sm mb-4 px-2 py-1">Ver mas...</p>
-      </div>
-      </section>
+<h1 className="title1">Profesionales más populares</h1>
+<section className="grid-cols-3 flex justify-center gap-10 mb-7">
+  {/*CARD 1*/}
+  <div className="bg-white p-4 w-[300px] h-auto">
+    <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
+      <Image
+        src="/FotoPerfilProvider.jpg"
+        alt="Consulta virtual"
+        width={300}
+        height={300}
+        className="w-full h-full object-cover" 
+        priority
+      />
+    </div>
+    <h2 className="title2 text-center">Pepita Flores</h2>
+    <div className="flex justify-center">
+      <button className="bg-secondary text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">Ver mas...</button>
+    </div>
+  </div>
+  {/*CARD 2*/}
+  <div className="bg-white p-4 w-[300px] h-auto">
+    <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
+      <Image
+        src="/FotoPerfilProvider2.jpg"
+        alt="Consulta virtual"
+        width={300}
+        height={300}
+        className="w-full h-full object-cover"
+        priority
+      />
+    </div>
+    <h2 className="title2 text-center">Pepita Flores</h2>
+    <div className="flex justify-center">
+      <button className="bg-secondary text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">Ver mas...</button>
+    </div>
+  </div>
+  {/*CARD 3*/}
+  <div className="bg-white p-4 w-[300px] h-auto">
+    <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
+      <Image
+        src="/FotoPerfilProvider3.jpg"
+        alt="Consulta virtual"
+        width={300}
+        height={300}
+        className="w-full h-full object-cover"
+        priority
+      />
+    </div>
+    <h2 className="title2 text-center">Pepita Flores</h2>
+    <div className="flex justify-center">
+      <button className="bg-secondary text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">Ver mas...</button>
+    </div>
+  </div>
+</section>
 
-      {/*----RESEÑAS----*/}
-      <h1 className="title1">Reseñas</h1>
+    
     </main>
   );
 }

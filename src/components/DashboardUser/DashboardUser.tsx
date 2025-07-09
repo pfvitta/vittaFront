@@ -4,30 +4,14 @@ import { User as UserIcon, History, Utensils, LogOut, Mail } from 'lucide-react'
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 
 export default function DashboardUser() {
   const { user, logout, hasMembership } = useAuth();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
   const handleLogout = () => {
-    setLoadingAction('logout');
-    setIsLoading(true);
-    setTimeout(() => {
-      logout();
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  const handleMembershipClick = () => {
-    setLoadingAction('membership');
-    setIsLoading(true);
-    setTimeout(() => {
-      router.push('/memberships');
-      setIsLoading(false);
-    }, 1000);
+    logout();
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,18 +24,6 @@ export default function DashboardUser() {
 
   return (
     <div className="flex p-5">
-      {/* Overlay de loading */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
-            <p className="mt-4 text-lg font-medium text-gray-700">
-              {loadingAction === 'logout' ? 'Cerrando sesión...' : 'Procesando membresía...'}
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Sidebar */}
       <aside className="bg-gray-100 m-1 rounded-xl border-gray-200 min-h-screen">
         <div className="p-4">
@@ -69,13 +41,9 @@ export default function DashboardUser() {
               Plan nutricional
             </button>
             <div className="border-t border-gray-200 my-4"></div>
-            <button 
-              className="btn-dashboard" 
-              onClick={handleLogout}
-              disabled={isLoading}
-            >
+            <button className="btn-dashboard" onClick={handleLogout}>
               <LogOut className="mr-3 h-4 w-4" />
-              {loadingAction === 'logout' ? 'Cerrando...' : 'Cerrar sesión'}
+              Cerrar sesión
             </button>
           </nav>
         </div>
@@ -149,10 +117,9 @@ export default function DashboardUser() {
                     <p className="text-gray-500 text-sm mb-4">Seguimiento seguro de tu salud</p>
                     <button
                       className="w-full bg-secondary border text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition"
-                      onClick={handleMembershipClick}
-                      disabled={isLoading}
+                      onClick={() => router.push('/memberships')}
                     >
-                      {loadingAction === 'membership' ? 'Cargando...' : 'Acceder ahora'}
+                      Acceder ahora
                     </button>
                   </>
                 ) : (

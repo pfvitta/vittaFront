@@ -16,6 +16,7 @@ import {
   createAppointment,
 } from '@/services/appointmentService';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 export default function AppointmentPage() {
   const params = useParams();
@@ -49,7 +50,9 @@ export default function AppointmentPage() {
     }
 
     if (selectedDates.length >= 2) {
-      alert('Solo puedes agendar 2 citas por mes.');
+      toast('Solo puedes agendar 2 citas por mes.', {
+        icon: '❗',
+      });
       return;
     }
 
@@ -65,7 +68,7 @@ export default function AppointmentPage() {
       }));
       setSelectedDates((prev) => [...prev, date]);
     } catch {
-      alert('Error al obtener disponibilidad para esta fecha.');
+      toast.error('Error al obtener disponibilidad para esta fecha.');
     } finally {
       setLoadingDate(null);
     }
@@ -77,7 +80,9 @@ export default function AppointmentPage() {
 
 const handleSubmit = async () => {
   if (!selectedDates || !selectedHours || !userId || !providerId) {
-    alert('Faltan datos para agendar el turno.');
+    toast('Faltan datos para agendar el turno.', {
+        icon: '❗',
+      });
     return;
   }
 
@@ -87,7 +92,9 @@ const handleSubmit = async () => {
     const time = selectedHours[isoDate]; // ← 'HH:mm'
 
     if (!time) {
-      alert('Falta seleccionar un horario.');
+      toast('Falta seleccionar un horario.', {
+        icon: '❗',
+      });
       return;
     }
 
@@ -99,17 +106,13 @@ const handleSubmit = async () => {
       status: 'pending',
     });
 
-    alert('Turno creado con éxito');
+    toast.success('Turno creado con éxito');
     window.location.href = '/dashboard/user/appointments';
   } catch (error) {
     console.error('Error al crear el turno:', error);
-    alert('Error al agendar los turnos');
+    toast.error('Error al agendar los turnos');
   }
 };
-
-
-
-
 
   return (
     <div className="max-w-4xl mx-auto p-6 font-sans">

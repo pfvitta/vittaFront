@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { CreditCard } from 'lucide-react';
 import { createCheckoutSession } from '@/services/stripeService';
 import { useAuth } from '@/context/AuthContext'; 
+import {toast} from 'react-hot-toast';
 
 const Memberships = () => {
   const { user } = useAuth();
@@ -29,7 +30,7 @@ const Memberships = () => {
       window.location.href = url;
     } catch (err) {
       console.error('Error en pago Stripe:', err);
-      setError(err instanceof Error ? err.message : 'Error al procesar pago con Stripe');
+      toast.error(err instanceof Error ? err.message : 'Error al procesar pago con Stripe');
     } finally {
       setLoading(null);
     }
@@ -62,7 +63,7 @@ const Memberships = () => {
             <button
               onClick={handleStripeCheckout}
               disabled={loading === 'stripe'}
-              className={`bg-[#635bff] text-white px-4 py-2 rounded-lg hover:bg-[#4a42d6] transition ${
+              className={`bg-secondary text-white px-4 py-2 rounded-lg hover:bg-primary transition ${
                 loading === 'stripe' ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >

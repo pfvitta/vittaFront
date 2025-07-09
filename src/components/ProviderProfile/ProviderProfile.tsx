@@ -48,13 +48,7 @@ export default function ProviderProfile() {
     }, 1000);
   };
 
-  const handleMembershipClick = () => {
-    setIsProcessing(true);
-    setTimeout(() => {
-      router.push('/memberships');
-      setIsProcessing(false);
-    }, 1000);
-  };
+  
 
   if (loading) return <p className="p-4">Cargando perfil...</p>;
   if (error || !provider) return <p className="p-4 text-red-500">Error: {error}</p>;
@@ -151,15 +145,7 @@ export default function ProviderProfile() {
         <p className="text-sm text-gray-700 mt-1">
           Incluye 2 sesiones al mes para consultas, controles o planes alimenticios.
         </p>
-        <div className="mt-4 flex justify-center">
-          <button
-            onClick={handleMembershipClick}
-            className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-full text-sm transition"
-            disabled={isProcessing}
-          >
-            {isProcessing ? 'Cargando...' : 'Acceder a membresía'}
-          </button>
-        </div>
+        
       </div>
     </div>
   );

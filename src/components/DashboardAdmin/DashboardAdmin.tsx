@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Provider } from '@/types/Provider';
 import { useRouter } from 'next/navigation'; // Importamos useRouter
+import {toast} from 'react-hot-toast';
 
 export default function AdminDashboard() {
   const router = useRouter(); // Instancia del router
@@ -36,7 +37,7 @@ export default function AdminDashboard() {
       });
 
       if (!res.ok) {
-        throw new Error('Error al cargar profesionales');
+        toast.error('Error al cargar profesionales');
       }
 
       const data: Provider[] = await res.json();
@@ -51,7 +52,7 @@ export default function AdminDashboard() {
       setProfessionals(providers);
     } catch (err) {
       console.error('Error:', err);
-      setError('Error al cargar los profesionales');
+      toast.error('Error al cargar los profesionales');
     } finally {
       setLoading(false);
     }
@@ -75,7 +76,7 @@ export default function AdminDashboard() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || 'Error al actualizar el estado');
+        toast.error(errorData.message || 'Error al actualizar el estado');
       }
 
       // Actualización optimista del estado
@@ -88,7 +89,7 @@ export default function AdminDashboard() {
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: unknown) {
       console.error('Error:', err);
-      setError(err instanceof Error ? err.message : 'Error al cambiar el estado');
+      toast.error(err instanceof Error ? err.message : 'Error al cambiar el estado');
       fetchData();
     }
   };

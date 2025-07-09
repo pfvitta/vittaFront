@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext'; 
 import { useState } from 'react';
+import {toast} from 'react-hot-toast';
 
 interface Specialty {
   id: string;
@@ -34,13 +35,15 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
 
     if (!id) {
       setIsLoading(false);
-      alert("El ID del profesional no está disponible.");
+      toast.error("El ID del profesional no está disponible.");
       return;
     }
 
     if (!isAuthenticated) {
       setIsLoading(false);
-      alert("Debes iniciar sesión para ver el perfil del profesional.");
+      toast('Debes iniciar sesión para ver el perfil del profesional.', {
+        icon: '❗',
+      });
       window.location.href = '/login'; // evita error CORS
       return;
     }
