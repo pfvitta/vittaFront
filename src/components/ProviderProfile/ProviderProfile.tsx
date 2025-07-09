@@ -7,6 +7,7 @@ import { getProviderById } from '@/services/providerService';
 import { Provider } from '@/types/Provider';
 import { useAuth } from '@/context/AuthContext';
 import { MapPin, User, IdCard } from 'lucide-react';
+import {toast} from 'react-hot-toast';
 
 export default function ProviderProfile() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function ProviderProfile() {
   const { hasMembership } = useAuth();
   const [provider, setProvider] = useState<Provider | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false); // Nuevo estado para el loading
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export default function ProviderProfile() {
         const data = await getProviderById(id);
         setProvider(data);
       } catch {
-        setError('Error al obtener el perfil del profesional');
+        toast.error('Error al obtener el perfil del profesional');
       } finally {
         setLoading(false);
       }
