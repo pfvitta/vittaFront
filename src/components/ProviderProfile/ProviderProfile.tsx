@@ -17,6 +17,7 @@ export default function ProviderProfile() {
   const [provider, setProvider] = useState<Provider | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false); // Nuevo estado para el loading
 
   useEffect(() => {
     if (!id) return;
@@ -36,11 +37,23 @@ export default function ProviderProfile() {
   }, [id]);
 
   const handleBookingClick = () => {
-    if (!hasMembership) {
-      router.push(`/memberships?redirectTo=/providers/${id}`);
-    } else {
-      router.push(`/providers/${id}/appointments`);
-    }
+    setIsProcessing(true);
+    setTimeout(() => {
+      if (!hasMembership) {
+        router.push(`/memberships?redirectTo=/providers/${id}`);
+      } else {
+        router.push(`/providers/${id}/appointments`);
+      }
+      setIsProcessing(false);
+    }, 1000);
+  };
+
+  const handleMembershipClick = () => {
+    setIsProcessing(true);
+    setTimeout(() => {
+      router.push('/memberships');
+      setIsProcessing(false);
+    }, 1000);
   };
 
   if (loading) return <p className="p-4">Cargando perfil...</p>;
@@ -48,6 +61,16 @@ export default function ProviderProfile() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Overlay de loading */}
+      {isProcessing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            <p className="mt-4 text-lg font-medium text-gray-700">Procesando...</p>
+          </div>
+        </div>
+      )}
+
       {/* Imagen */}
       <div className="col-span-1 flex justify-center md:justify-start">
         <div className="w-60 h-60 relative rounded-xl border border-primary overflow-hidden">
@@ -114,8 +137,9 @@ export default function ProviderProfile() {
           <button
             onClick={handleBookingClick}
             className="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-full text-sm transition"
+            disabled={isProcessing}
           >
-            Agendar citas
+            {isProcessing ? 'Cargando...' : 'Agendar citas'}
           </button>
         </div>
       </div>
@@ -127,15 +151,16 @@ export default function ProviderProfile() {
         <p className="text-sm text-gray-700 mt-1">
           Incluye 2 sesiones al mes para consultas, controles o planes alimenticios.
         </p>
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={handleMembershipClick}
+            className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-full text-sm transition"
+            disabled={isProcessing}
+          >
+            {isProcessing ? 'Cargando...' : 'Acceder a membresía'}
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
