@@ -4,11 +4,10 @@ import { useForm } from "react-hook-form";
 import { loginUser } from "@/services/authService";
 import { getUserById } from "@/services/userService";
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
-import { useAuth } from "../../context/AuthContext"; // ✅ asegúrate que esta ruta esté correcta
+import { useAuth } from "../../context/AuthContext";
 
 type LoginFormValues = {
   email: string;
@@ -28,44 +27,74 @@ export default function Login() {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({ mode: "onChange" });
   const [serverError, setServerError] = useState<string | null>(null);
-  const { login } = useAuth(); // ✅ traemos la función desde el contexto
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const { login } = useAuth();
 
   const onSubmit = async (data: LoginFormValues) => {
     setServerError(null);
+    setIsLoggingIn(true);
+    
     try {
-      const response = await loginUser(data); // 👈 te devuelve { token }
-
+      const response = await loginUser(data);
       const { token } = response;
       if (!token) throw new Error("Falta token en la respuesta del login");
 
-      // ✅ Decodificamos el token
       const decoded = jwtDecode<TokenPayload>(token);
       const userId = decoded.sub;
       const role = decoded.roles || "user";
 
       if (!userId) throw new Error("El token no contiene userId");
 
-      // ✅ Obtenemos la información del usuario
       const user = await getUserById(userId, token);
-
-      // ✅ Usamos la función login del contexto
       login(user, token, role);
 
-      // ✅ Navegamos al dashboard correspondiente
-      if (role === "provider") {
-        router.push("/dashboard/provider");
-      } else {
-        router.push("/dashboard/user");
-      }
+      setTimeout(() => {
+        if (role === "provider") {
+          router.push("/dashboard/provider");
+        } else {
+          router.push("/dashboard/user");
+        }
+      }, 1000);
+
     } catch (error) {
+      setIsLoggingIn(false);
       const err = error as Error;
       console.error("Login error:", err.message);
       setServerError(err.message || "Error al iniciar sesión");
     }
   };
 
+  const handleGoogleLogin = () => {
+    setIsGoogleLoading(true);
+    // Simulamos la redirección después de 1 segundo
+    setTimeout(() => {
+      router.push("/auth/login");
+    }, 1000);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-tertiary bg-opacity-80 px-4">
+      {/* Loading para inicio de sesión normal */}
+      {isLoggingIn && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            <p className="mt-4 text-lg font-medium text-gray-700">Iniciando sesión...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Loading para Google */}
+      {isGoogleLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            <p className="mt-4 text-lg font-medium text-gray-700">Redirigiendo...</p>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <div className="flex justify-center mb-8">
           <Image
@@ -103,7 +132,7 @@ export default function Login() {
                 },
               })}
               className="input-form"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoggingIn || isGoogleLoading}
             />
             {errors.email && (
               <p className="text-red-500 text-sm mt-1">
@@ -120,7 +149,7 @@ export default function Login() {
                 required: "La contraseña es obligatoria",
               })}
               className="input-form"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoggingIn || isGoogleLoading}
             />
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">
@@ -131,15 +160,15 @@ export default function Login() {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isLoggingIn || isGoogleLoading}
             className={`w-full bg-primary text-white py-2 rounded-full hover:bg-teal-800 transition-colors ${
-              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+              isSubmitting || isLoggingIn || isGoogleLoading ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
-            {isSubmitting ? (
+            {isSubmitting || isLoggingIn ? (
               <span className="flex items-center justify-center">
                 <svg
-                  className="animate-spin h-5 w-5 mr-3 ..."
+                  className="animate-spin h-5 w-5 mr-3"
                   viewBox="0 0 24 24"
                 ></svg>
                 Procesando...
@@ -150,14 +179,27 @@ export default function Login() {
           </button>
         </form>
 
-        <Link className="mt-4 block" href="/auth/login">
-          <button className="w-full text-secondary border border-secondary px-4 py-2 rounded-full text-sm hover:border-primary hover:text-primary transition">
-            Continuar con Google
-          </button>
-        </Link>
+        <button
+          onClick={handleGoogleLogin}
+          disabled={isLoggingIn || isGoogleLoading}
+          className={`w-full text-secondary border border-secondary px-4 py-2 rounded-full text-sm hover:border-primary hover:text-primary transition mt-4 ${
+            isGoogleLoading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
+        >
+          {isGoogleLoading ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="animate-spin h-5 w-5 mr-3"
+                viewBox="0 0 24 24"
+              ></svg>
+              Redirigiendo...
+            </span>
+          ) : (
+            "Continuar con Google"
+          )}
+        </button>
 
         <div className="mt-4 text-sm text-gray-600 text-center">
-          {" "}
           ¿Olvidaste tu contraseña?{" "}
           <a href="#" className="text-gray-600 hover:underline">
             Click aquí
