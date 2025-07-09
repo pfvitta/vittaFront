@@ -5,7 +5,7 @@ export interface UserSession {
     name: string;
     email: string;
     picture?: string;
-    [key: string]: any;
+    [key: string]: string | undefined;
   } | null;
   role: string | null;
 }
