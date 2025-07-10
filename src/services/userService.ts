@@ -1,4 +1,5 @@
 import { RegisterUserValues } from "@/types/forms/RegisterUser";
+
   
 /** 
   export const registerUser = async (userData: RegisterUserValues) => {
@@ -16,8 +17,9 @@ import { RegisterUserValues } from "@/types/forms/RegisterUser";
     return await res.json();
   };
 */
+
   export const registerUser = async (userData: RegisterUserValues) => {
-    const res = await fetch("http://localhost:4000/auth/signup", {
+    const res = await fetch(`${process.env.API_URL_BACK}/auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
@@ -43,7 +45,7 @@ import { RegisterUserValues } from "@/types/forms/RegisterUser";
 
 
   export const getUserById = async (id: string, token: string) => {
-    const res = await fetch(`http://localhost:4000/users/${id}`, {
+    const res = await fetch(`${process.env.API_URL_BACK}/users/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
