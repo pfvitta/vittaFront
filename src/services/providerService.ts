@@ -2,7 +2,7 @@
 import { RegisterProviderValues } from "../types/forms/RegisterProviders";
 
 export const registerProvider = async (data: RegisterProviderValues) => {
-    const res = await fetch(`${process.env.API_URL_BACK}/auth/signup`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -22,7 +22,7 @@ import { Provider } from '../types/Provider';
 
 export const getProviders = async (): Promise<Provider[]> => {
   try {
-    const res = await fetch(`${process.env.API_URL_BACK}/users`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -66,7 +66,7 @@ export const getProviders = async (): Promise<Provider[]> => {
 
 export const getProviderById = async (id: string): Promise<Provider> => {
   try {
-    const res = await fetch(`${process.env.API_URL_BACK}/users/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });

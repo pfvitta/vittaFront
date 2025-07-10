@@ -9,7 +9,7 @@ export interface Appointment {
     name: string;
     email: string;
   };
-  date: string;
+  date: Date;
   time: string;
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
 }
@@ -17,7 +17,7 @@ export interface Appointment {
 export type CreateAppointmentPayload = {
   userId: string;
   professionalId: string;
-  date: string; // en formato 'YYYY-MM-DD'
+  date: Date; // en formato 'YYYY-MM-DD'
   time: string; // en formato 'HH:mm'
   status: 'pending' | 'confirmed' | 'cancelled'; // si definiste estos posibles estados
 };

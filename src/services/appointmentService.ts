@@ -14,7 +14,7 @@ export interface ValidateAppointmentPayload {
 export interface CreateAppointmentPayload {
   userId: string;
   professionalId: string;
-  date: string; // formato 'YYYY-MM-DD'
+  date: Date; // formato 'YYYY-MM-DD'
   time: string; // '08:00', '09:00', etc.
   status: string; // por ejemplo 'Pendiente' o 'Confirmado'
 }
@@ -27,7 +27,7 @@ export const getAvailableHours = async ({
   professionalId: string;
   date: string;
 }): Promise<AvailableHour[]> => {
-  const response = await fetch(`${process.env.API_URL_BACK}/appointments/validate`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/validate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ professionalId, date }),
@@ -49,10 +49,10 @@ export const getAvailableHours = async ({
 export async function createAppointment(data: CreateAppointmentPayload) {
   console.log('Payload a enviar a /appointments/create:', data);
 
-  const response = await fetch(`${process.env.API_URL_BACK}/appointments/create`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify(data), // ✅ Date se serializa automáticamente como ISO 8601
   });
 
   if (!response.ok) {
@@ -63,6 +63,7 @@ export async function createAppointment(data: CreateAppointmentPayload) {
 
   return await response.json();
 }
+
 
 
 

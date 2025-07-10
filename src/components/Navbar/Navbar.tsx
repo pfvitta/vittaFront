@@ -16,6 +16,7 @@ const Navbar = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -32,7 +33,6 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    router.push("/auth/logout");
   };
 
   const handleNavigation = (path: string, customText: string = "Cargando...") => {

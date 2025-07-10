@@ -80,29 +80,31 @@ export default function AppointmentPage() {
 
 const handleSubmit = async () => {
   if (!selectedDates || !selectedHours || !userId || !providerId) {
-    toast('Faltan datos para agendar el turno.', {
-        icon: '❗',
-      });
+    toast('Faltan datos para agendar el turno.', { icon: '❗' });
+    return;
+  }
+
+  const selectedDate = selectedDates[0];
+  const dateOnly = new Date(
+    selectedDate.getFullYear(),
+    selectedDate.getMonth(),
+    selectedDate.getDate()
+  ); // ✅ Date limpio sin hora
+
+  const dateStr = dateOnly.toISOString().split('T')[0]; // usado solo como clave
+  const time = selectedHours[dateStr];
+
+  if (!time) {
+    toast('Falta seleccionar un horario.', { icon: '❗' });
     return;
   }
 
   try {
-    const selectedDate = selectedDates[0];
-    const isoDate = selectedDate.toISOString().split('T')[0]; // ← 'YYYY-MM-DD'
-    const time = selectedHours[isoDate]; // ← 'HH:mm'
-
-    if (!time) {
-      toast('Falta seleccionar un horario.', {
-        icon: '❗',
-      });
-      return;
-    }
-
     await createAppointment({
       userId,
       professionalId: providerId,
-      date: isoDate,   // ✅ string, no Date
-      time: time,      // ✅ string sin segundos
+      date: dateOnly, // ✅ se envía como Date
+      time,
       status: 'pending',
     });
 
@@ -113,6 +115,8 @@ const handleSubmit = async () => {
     toast.error('Error al agendar los turnos');
   }
 };
+
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 font-sans">
