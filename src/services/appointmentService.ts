@@ -68,10 +68,15 @@ export async function createAppointment(data: CreateAppointmentPayload) {
 
 
 export const getAppointmentsByUser = async (userId: string): Promise<Appointment[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/user/${userId}`);
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/appointments/user/${userId}`;
+  console.log('URL completa que se va a fetch:', url);
+
+  const res = await fetch(url);
+
   if (!res.ok) throw new Error('Error al obtener turnos del usuario');
   return res.json();
 };
+
 
 export const getAppointmentsByProvider = async (providerId: string): Promise<Appointment[]> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/provider/${providerId}`);

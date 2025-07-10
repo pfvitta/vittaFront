@@ -89,6 +89,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(fullUser);
         setRole(roleFromSession);
         setIsAuthenticated(true);
+        localStorage.setItem('userId', fullUser.id);
+
         return;
       }
 
