@@ -15,7 +15,7 @@ export default async function Home() {
         {/*CARD 1*/}
         <div className="bg-white rounded-xl p-4 w-[350px] h-auto">
           <Image
-            src="/foto-consulta1.jfif"
+            src="/obesidad.jpeg"
             alt="Consulta virtual"
             width={400}
             height={400}
@@ -28,7 +28,7 @@ export default async function Home() {
         {/*CARD 2*/}
         <div className="bg-white rounded-xl p-4 w-[350px] h-auto">
           <Image
-            src="/foto-consulta2.jfif"
+            src="/trastornos-alimenticios.jpeg"
             alt="Consulta virtual"
             width={400}
             height={400}
@@ -41,7 +41,7 @@ export default async function Home() {
         {/*CARD 3*/}
         <div className="bg-white rounded-xl p-4 w-[350px] h-auto">
           <Image
-            src="/foto-consulta3.jfif"
+            src="/diabetes.jpeg"
             alt="Consulta virtual"
             width={400}
             height={400}

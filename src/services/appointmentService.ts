@@ -3,7 +3,7 @@
 import { Appointment } from "@/types/Appointment";
 
 export type AvailableHour = { hourHand: string };
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+//const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
 export interface ValidateAppointmentPayload {
@@ -27,7 +27,7 @@ export const getAvailableHours = async ({
   professionalId: string;
   date: string;
 }): Promise<AvailableHour[]> => {
-  const response = await fetch(`${API_URL}/appointments/validate`, {
+  const response = await fetch(`${process.env.API_URL_BACK}/appointments/validate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ professionalId, date }),
@@ -49,7 +49,7 @@ export const getAvailableHours = async ({
 export async function createAppointment(data: CreateAppointmentPayload) {
   console.log('Payload a enviar a /appointments/create:', data);
 
-  const response = await fetch('http://localhost:4000/appointments/create', {
+  const response = await fetch(`${process.env.API_URL_BACK}/appointments/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
