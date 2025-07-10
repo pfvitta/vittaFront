@@ -1,5 +1,5 @@
 import { RegisterUserValues } from "@/types/forms/RegisterUser";
-  
+
 /** 
   export const registerUser = async (userData: RegisterUserValues) => {
     const res = await fetch("http://localhost:4000/auth/signup", {
@@ -16,30 +16,31 @@ import { RegisterUserValues } from "@/types/forms/RegisterUser";
     return await res.json();
   };
 */
-  export const registerUser = async (userData: RegisterUserValues) => {
-    const res = await fetch("http://localhost:4000/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
-    });
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(errorText || "Error al registrar usuario");
-    }
+export const registerUser = async (userData: RegisterUserValues) => {
+  const res = await fetch(`${process.env.API_URL_BACK}/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData),
+  });
 
-    const text = await res.text();
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || "Error al registrar usuario");
+  }
 
-    // 🧠 Validar que no sea vacío
-    if (!text) return {};
+  const text = await res.text();
 
-    try {
-      return JSON.parse(text);
-    } catch (err) {
-      console.error("Respuesta no es JSON válido:", text, err);
-      throw new Error("Error al parsear respuesta del backend");
-    }
-  };
+  // 🧠 Validar que no sea vacío
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    console.error("Respuesta no es JSON válido:", text, err);
+    throw new Error("Error al parsear respuesta del backend");
+  }
+};
 
 export const registerUser = async (userData: RegisterUserValues) => {
   const res = await fetch("http://localhost:4000/auth/signup", {
@@ -48,10 +49,19 @@ export const registerUser = async (userData: RegisterUserValues) => {
     body: JSON.stringify(userData.user),
   });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(errorText || "Error al registrar usuario");
-  }
+  export const getUserById = async (id: string, token: string) => {
+    const res = await fetch(`${process.env.API_URL_BACK}/users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("No se pudo obtener el usuario");
+    }
+
+    return await res.json();
+  };
 
   const text = await res.text();
 

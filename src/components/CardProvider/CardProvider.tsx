@@ -1,14 +1,16 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext'; 
+import { useState } from 'react';
+import {toast} from 'react-hot-toast';
 
 interface Specialty {
   id: string;
   name: string;
 }
+
 interface CardProviderProps {
   id: string;
   name: string;
@@ -20,6 +22,7 @@ interface CardProviderProps {
 const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProviderProps) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Optimización para imágenes de Cloudinary
   const optimizedImageUrl = imageUrl.includes('res.cloudinary.com') 
@@ -27,22 +30,42 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
     : imageUrl;
 
   const handleProtectedClick = () => {
+    setIsLoading(true);
+    console.log('[handleProtectedClick]', { isAuthenticated, id });
+
     if (!id) {
-      alert("El ID del profesional no está disponible.");
+      setIsLoading(false);
+      toast.error("El ID del profesional no está disponible.");
       return;
     }
 
     if (!isAuthenticated) {
-      alert("Debes iniciar sesión para ver el perfil del profesional.");
-      router.push('/login');
+      setIsLoading(false);
+      toast('Debes iniciar sesión para ver el perfil del profesional.', {
+        icon: '❗',
+      });
+      window.location.href = '/login'; // evita error CORS
       return;
     }
 
-    router.push(`/providers/${id}`);
+    setTimeout(() => {
+      router.push(`/providers/${id}`);
+      setIsLoading(false);
+    }, 1000); // Loading de 1 segundo
   };
 
   return (
     <div className="flex bg-gray-100 rounded-xl shadow-md p-4 max-w-3xl w-full">
+      {/* Overlay de loading */}
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            <p className="mt-4 text-lg font-medium text-gray-700">Cargando perfil...</p>
+          </div>
+        </div>
+      )}
+
       {/* Imagen con optimización */}
       <div className="w-36 h-36 relative rounded-lg border border-primary overflow-hidden mr-4">
         <Image 
@@ -57,7 +80,7 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
         />
       </div>
     
-      {/* Resto del código permanece igual */}
+      {/* Contenido de la tarjeta */}
       <div className="flex-1">
         <div className="flex justify-between items-start mb-1">
           <h3 className="text-2xl font-bold text-secondary mb-1">{name}</h3>
@@ -68,7 +91,7 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
           {specialty.map((item) => (
             <span
               key={item.id}
-              className="border border-tertiary text-tertiary text-xs px-2 py-1 rounded-full"
+              className="bg-yellow-400 text-white px-3 py-1 rounded-full text-sm font-semibold"
             >
               {item.name}
             </span>
@@ -78,11 +101,13 @@ const CardProvider = ({ id, name, imageUrl, specialty, biography }: CardProvider
         <p className="text-sm text-secondary mb-3">{biography}</p>
 
         <div className='flex justify-end'>
-          <Link href={`/providers/${id}`} onClick={handleProtectedClick}>
-            <button className="text-sm px-4 py-2 rounded-full bg-secondary text-white hover:bg-primary transition">
-              Ver perfil
-            </button>
-          </Link>
+          <button
+            onClick={handleProtectedClick}
+            className="text-sm px-4 py-2 rounded-full bg-secondary text-white hover:bg-primary transition"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Cargando...' : 'Ver perfil'}
+          </button>
         </div>
       </div>
     </div>

@@ -1,89 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { CreditCard } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
-
-// Cargar Stripe con la clave pública desde las variables de entorno
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+import { createCheckoutSession } from '@/services/stripeService';
+import { useAuth } from '@/context/AuthContext'; 
+import {toast} from 'react-hot-toast';
 
 const Memberships = () => {
-  const [loading, setLoading] = useState<'paypal' | 'stripe' | null>(null);
+  const { user } = useAuth();
+  const [loading, setLoading] = useState<'stripe' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
-  const handlePaypalPayment = async () => {
-    setLoading('paypal');
-    setError(null);
-    
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/paypal/create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al crear orden de PayPal');
-      }
-
-      const { url } = await response.json();
-      
-      if (!url) {
-        throw new Error('No se recibió URL de redirección de PayPal');
-      }
-
-      window.location.href = url;
-    } catch (err) {
-      console.error('Error en pago PayPal:', err);
-      setError(err instanceof Error ? err.message : 'Error al procesar pago con PayPal');
-      setLoading(null);
+  useEffect(() => {
+    const from = searchParams.get('from');
+    if (from && from !== '/memberships') {
+      localStorage.setItem('previousPath', from);
     }
-  };
+  }, [searchParams]);
 
-  const handleStripePayment = async () => {
+  const handleStripeCheckout = async () => {
     setLoading('stripe');
     setError(null);
 
     try {
-      // 1. Inicializar Stripe
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error('No se pudo cargar Stripe');
-
-      // 2. Crear la sesión de pago en el backend
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/stripe/create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al crear orden de pago');
-      }
-
-      const { clientSecret } = await response.json();
-      
-      if (!clientSecret) {
-        throw new Error('No se recibió clientSecret de Stripe');
-      }
-
-      // 3. Confirmar el pago y redirigir
-      const { error: stripeError } = await stripe.confirmPayment({
-        clientSecret,
-        
-        confirmParams: {
-          return_url: `${window.location.origin}/success`, // Añadido dentro de confirmParams
-        }
-      });
-
-      if (stripeError) throw stripeError;
-
+      if (!user?.email) throw new Error('Usuario no autenticado o sin email');
+      const { url } = await createCheckoutSession(user.email);
+      window.location.href = url;
     } catch (err) {
       console.error('Error en pago Stripe:', err);
-      setError(err instanceof Error ? err.message : 'Error al procesar pago con Stripe');
+      toast.error(err instanceof Error ? err.message : 'Error al procesar pago con Stripe');
+    } finally {
       setLoading(null);
     }
   };
@@ -107,29 +55,19 @@ const Memberships = () => {
           </div>
 
           <div className="mb-6">
-            <p className="text-2xl font-bold text-primary">$50.000</p>
+            <p className="text-2xl font-bold text-primary">$49.99</p>
             <p className="text-sm text-primary">por mes</p>
           </div>
 
           <div className="flex flex-col space-y-3">
             <button
-              onClick={handlePaypalPayment}
-              disabled={loading === 'paypal'}
-              className={`bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition ${
-                loading === 'paypal' ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
-            >
-              {loading === 'paypal' ? 'Procesando...' : 'Pagar con PayPal'}
-            </button>
-            
-            <button
-              onClick={handleStripePayment}
+              onClick={handleStripeCheckout}
               disabled={loading === 'stripe'}
-              className={`bg-[#635bff] text-white px-4 py-2 rounded-lg hover:bg-[#4a42d6] transition ${
+              className={`bg-secondary text-white px-4 py-2 rounded-lg hover:bg-primary transition ${
                 loading === 'stripe' ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >
-              {loading === 'stripe' ? 'Procesando...' : 'Pagar con Stripe'}
+              {loading === 'stripe' ? 'Redirigiendo...' : 'Pagar con Stripe'}
             </button>
           </div>
 
@@ -151,3 +89,5 @@ const Memberships = () => {
 };
 
 export default Memberships;
+
+

@@ -1,25 +1,26 @@
 import Hero from "@/components/Hero/Hero";
 import Image from 'next/image';
-<<<<<<< HEAD
+
 import { redirect } from "next/navigation";
 import { auth0 } from "@/lib/auth0";
-=======
+
 import { auth0 } from "@/lib/auth0";
 import {redirect} from "next/navigation"
->>>>>>> c241c0df661ebc0051db767cc4f5c9ef6741bab1
+
 
 export default async function Home() {
 
   // Valida si hay una sesion activa 
    const session = await auth0.getSession();
 
-<<<<<<< HEAD
-
-=======
->>>>>>> c241c0df661ebc0051db767cc4f5c9ef6741bab1
    if (session) {
     redirect("/dashboard/user"); // Si no hay sesión, envía al home
   }
+
+
+export default async function Home() {
+
+
 
   return (
     <main>
@@ -32,7 +33,7 @@ export default async function Home() {
         {/*CARD 1*/}
         <div className="bg-white rounded-xl p-4 w-[350px] h-auto">
           <Image
-            src="/foto-consulta1.jfif"
+            src="/obesidad.jpeg"
             alt="Consulta virtual"
             width={400}
             height={400}
@@ -45,7 +46,7 @@ export default async function Home() {
         {/*CARD 2*/}
         <div className="bg-white rounded-xl p-4 w-[350px] h-auto">
           <Image
-            src="/foto-consulta2.jfif"
+            src="/trastornos-alimenticios.jpeg"
             alt="Consulta virtual"
             width={400}
             height={400}
@@ -58,7 +59,7 @@ export default async function Home() {
         {/*CARD 3*/}
         <div className="bg-white rounded-xl p-4 w-[350px] h-auto">
           <Image
-            src="/foto-consulta3.jfif"
+            src="/diabetes.jpeg"
             alt="Consulta virtual"
             width={400}
             height={400}
@@ -72,57 +73,62 @@ export default async function Home() {
 
 
       {/*----PROFESIONALES MAS FRECUENTES----*/}
-      <h1 className="title1">Profesionales más populares</h1>
-      <section className="grid-cols-3 flex justify-center gap-10 mb-7">
-        {/*CARD 1*/}
-        <div className="bg-white p-4 w-[300px] h-auto">
-          <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
-            <Image
-              src="/FotoPerfilProvider.jpg"
-              alt="Consulta virtual"
-              width={300}
-              height={300}
-              className="w-full h-full object-cover" 
-              priority
-            />
-          </div>
-        <h2 className="title2 text-center">Pepita Flores</h2>
-        <p className="text-gray-600 text-center text-sm mb-4 px-2 py-1">Ver mas...</p>
-      </div>
-      {/*CARD 2*/}
-        <div className="bg-white p-4 w-[300px] h-auto">
-          <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
-            <Image
-              src="/FotoPerfilProvider2.jpg"
-              alt="Consulta virtual"
-              width={300}
-              height={300}
-              className="w-full h-full object-cover"
-              priority
-            />
-          </div>
-        <h2 className="title2 text-center">Pepita Flores</h2>
-        <p className="text-gray-600 text-center text-sm mb-4 px-2 py-1">Ver mas...</p>
-      </div>
-      {/*CARD 3*/}
-        <div className="bg-white p-4 w-[300px] h-auto">
-          <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
-            <Image
-              src="/FotoPerfilProvider3.jpg"
-              alt="Consulta virtual"
-              width={300}
-              height={300}
-              className="w-full h-full object-cover"
-              priority
-            />
-          </div>
-        <h2 className="title2 text-center">Pepita Flores</h2>
-        <p className="text-gray-600 text-center text-sm mb-4 px-2 py-1">Ver mas...</p>
-      </div>
-      </section>
+<h1 className="title1">Profesionales más populares</h1>
+<section className="grid-cols-3 flex justify-center gap-10 mb-7">
+  {/*CARD 1*/}
+  <div className="bg-white p-4 w-[300px] h-auto">
+    <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
+      <Image
+        src="/FotoPerfilProvider.jpg"
+        alt="Consulta virtual"
+        width={300}
+        height={300}
+        className="w-full h-full object-cover" 
+        priority
+      />
+    </div>
+    <h2 className="title2 text-center">Pepita Flores</h2>
+    <div className="flex justify-center">
+      <button className="bg-secondary text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">Ver mas...</button>
+    </div>
+  </div>
+  {/*CARD 2*/}
+  <div className="bg-white p-4 w-[300px] h-auto">
+    <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
+      <Image
+        src="/FotoPerfilProvider2.jpg"
+        alt="Consulta virtual"
+        width={300}
+        height={300}
+        className="w-full h-full object-cover"
+        priority
+      />
+    </div>
+    <h2 className="title2 text-center">Pepita Flores</h2>
+    <div className="flex justify-center">
+      <button className="bg-secondary text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">Ver mas...</button>
+    </div>
+  </div>
+  {/*CARD 3*/}
+  <div className="bg-white p-4 w-[300px] h-auto">
+    <div className="w-[300px] h-[300px] rounded-full overflow-hidden">
+      <Image
+        src="/FotoPerfilProvider3.jpg"
+        alt="Consulta virtual"
+        width={300}
+        height={300}
+        className="w-full h-full object-cover"
+        priority
+      />
+    </div>
+    <h2 className="title2 text-center">Pepita Flores</h2>
+    <div className="flex justify-center">
+      <button className="bg-secondary text-white px-4 py-2 rounded-full text-sm hover:bg-primary hover:text-white transition">Ver mas...</button>
+    </div>
+  </div>
+</section>
 
-      {/*----RESEÑAS----*/}
-      <h1 className="title1">Reseñas</h1>
+    
     </main>
   );
 }

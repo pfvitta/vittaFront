@@ -8,4 +8,17 @@ export type UserData = {
     dob: string;
     role: "user";
     avatarUrl?: string;
+    membership?: {
+  status: 'Active' | 'Inactive';
+  startDate?: string;
+  endDate?: string;
+  price?: number;
+  type?: string;
+};
+   file?: {
+    id?: string;
+    imgUrl?: string;
+    filename?: string;
+    mimetype?: string;
+  };
   };

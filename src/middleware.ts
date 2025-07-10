@@ -1,5 +1,5 @@
-import { NextResponse, NextRequest } from 'next/server';
-import { auth0 } from './lib/auth0';
+import { NextResponse, NextRequest } from "next/server";
+import { auth0 } from "./lib/auth0";
 
 export async function middleware(request: NextRequest) {
   const origin = request.nextUrl.origin;
@@ -19,30 +19,29 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // 🔐 Protección por roles
-  if (path.startsWith('/admin') && !roles.includes('admin')) {
-    return NextResponse.redirect(new URL('/acceso-denegado', origin));
+  if (path.startsWith("/admin") && !roles.includes("admin")) {
+    return NextResponse.redirect(new URL("/acceso-denegado", origin));
   }
 
-  if (path.startsWith('/provider') && !roles.includes('provider')) {
-    return NextResponse.redirect(new URL('/acceso-denegado', origin));
-  }
+  // if (path.startsWith('/provider/id') && !roles.includes('provider')) {
+  //   return NextResponse.redirect(new URL('/acceso-denegado', origin));
+  // }
 
-  if (path.startsWith('/user') && !roles.includes('user')) {
-    return NextResponse.redirect(new URL('/acceso-denegado', origin));
+  if (path.startsWith("/user") && !roles.includes("user")) {
+    return NextResponse.redirect(new URL("/acceso-denegado", origin));
   }
 
   return authResponse || NextResponse.next();
 }
 
-export  const  config  =  { 
-  matcher : [ 
-    /* 
-     * Coincide con todas las rutas de solicitud excepto las que empiezan por: 
-     * - _next/static (archivos estáticos) 
-     * - _next/image (archivos de optimización de imágenes) 
-     * - favicon.ico, sitemap.xml, robots.txt (archivos de metadatos) 
+export const config = {
+  matcher: [
+    /*
+     * Coincide con todas las rutas de solicitud excepto las que empiezan por:
+     * - _next/static (archivos estáticos)
+     * - _next/image (archivos de optimización de imágenes)
+     * - favicon.ico, sitemap.xml, robots.txt (archivos de metadatos)
      */
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)" 
-  ] 
-} ; 
-
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+  ],
+};
