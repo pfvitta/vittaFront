@@ -43,12 +43,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           if (data?.user?.email) {
             // Paso 1: verificar si existe el usuario en backend
             const existsRes = await fetch(
-              `http://localhost:4000/users/exists/${data.user.email}`
+              `${process.env.API_URL_BACK}/users/exists/${data.user.email}`
             );
 
             if (existsRes.status === 404) {
               console.log('[SYNC] Usuario no existe. Creando...');
-              await fetch('http://localhost:4000/auth/signup', {
+              await fetch(`${process.env.API_URL_BACK}/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
             // Paso 2: obtener usuario completo (con membresía)
             const userRes = await fetch(
-              `http://localhost:4000/users/by-email/${data.user.email}`
+              `${process.env.API_URL_BACK}/users/by-email/${data.user.email}`
             );
 
             if (!userRes.ok) {
