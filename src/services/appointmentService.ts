@@ -95,3 +95,12 @@ export const cancelAppointment = async (appointmentId: string) => {
   return res.json();
 };
 
+export const confirmAppointment = async (appointmentId: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/provider/confirm/${appointmentId}`, {
+    method: 'PATCH',
+  });
+  if (!res.ok) throw new Error('Error al confirmar turno');
+  return await res.json();
+};
+
+
