@@ -78,14 +78,17 @@ export const getAppointmentsByUser = async (userId: string): Promise<Appointment
 };
 
 
-export const getAppointmentsByProvider = async (providerId: string): Promise<Appointment[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/provider/${providerId}`);
-  if (!res.ok) throw new Error('Error al obtener turnos del proveedor');
-  return res.json();
+export const getAppointmentsByProvider = async (professionalId: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/provider/${professionalId}`);
+  if (!res.ok) throw new Error('Error al obtener turnos del profesional');
+  return await res.json();
 };
 
-export const cancelAppointment = async (id: string) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/${id}/cancel`, {
+
+
+
+export const cancelAppointment = async (appointmentId: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/cancel/${appointmentId}`, {
     method: 'PATCH',
   });
   if (!res.ok) throw new Error('Error al cancelar turno');

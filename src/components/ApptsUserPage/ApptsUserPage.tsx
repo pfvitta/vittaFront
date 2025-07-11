@@ -26,17 +26,18 @@ export default function UserAppointmentsPage() {
   }, [user?.id]);
 
   const handleCancel = async (id: string) => {
-    try {
-      await cancelAppointment(id);
-      setAppointments((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, status: 'cancelled' } : a))
-      );
-      toast.success('Turno cancelado con éxito');
-    } catch (error) {
-      console.error('Error al cancelar turno:', error);
-      toast.error('Error al cancelar turno');
-    }
-  };
+  try {
+    await cancelAppointment(id); 
+    setAppointments((prev) =>
+      prev.map((appt) => (appt.id === id ? { ...appt, status: 'cancelled' } : appt))
+    );
+    toast.success('Turno cancelado');
+  } catch (error) {
+    console.error('Error al cancelar turno:', error);
+    toast.error('No se pudo cancelar el turno');
+  }
+};
+
 
   return (
     <div>
