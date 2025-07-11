@@ -19,6 +19,9 @@ import { useAuth } from '@/context/AuthContext';
 import { getProviderById } from '@/services/providerService';
 import { Provider } from '@/types/Provider';
 import { toast } from 'react-hot-toast';
+import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+
 
 export default function AppointmentPage() {
   const [provider, setProvider] = useState<Provider | null>(null);
@@ -144,79 +147,155 @@ export default function AppointmentPage() {
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto p-6 font-sans">
-      <div className="bg-white p-6 rounded-xl shadow-md space-y-6">
-        <h1 className="text-3xl font-bold text-secondary text-center">Agenda tu cita</h1>
 
-        {loadingProvider && <p className="text-center text-gray-600">Cargando proveedor...</p>}
+// Dentro de tu componente:
+const router = useRouter();
 
-        {!loadingProvider && (
-          <>
-            <div>
-              <h2 className="text-sm font-semibold text-gray-700 mb-2">Selecciona fecha y horario</h2>
-              <div className="flex gap-2 overflow-x-auto">
-                {days.map((day) => {
-                  const formatted = format(day, 'dd/MM', { locale: es });
-                  const isSelected = selectedDates.some((d) => isSameDay(d, day));
-                  return (
-                    <button
-                      key={day.toISOString()}
-                      onClick={() => toggleDate(day)}
-                      disabled={loadingDate !== null}
-                      className={`px-4 py-2 rounded-full border text-sm ${
-                        isSelected
-                          ? 'bg-secondary text-white'
-                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {formatted}
-                    </button>
-                  );
-                })}
-              </div>
+return (
+  <motion.div
+    initial={{ opacity: 0, y: 15 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className="max-w-4xl mx-auto p-6 font-sans space-y-8"
+  >
+    <div className="text-center space-y-2">
+      <h1 className="text-3xl font-bold text-gray-800">Agenda tu cita</h1>
+      <p className="text-gray-600 text-sm">
+        Selecciona la fecha y horario que mejor se adapte a ti
+      </p>
+    </div>
+
+    {/* Profesional */}
+    {provider && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white rounded-xl shadow p-4 flex items-center justify-between"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gray-200 rounded-full" />
+          <div>
+            <p className="font-semibold">{provider.name}</p>
+            <div className="flex gap-2 mt-1 flex-wrap">
+              {provider.professionalProfile?.specialty?.map((tag) => (
+  <span
+    key={tag.id}
+    className="bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full text-xs"
+  >
+    {tag.name.toUpperCase()}
+  </span>
+))}
+
+
             </div>
+          </div>
+        </div>
+        <button
+          onClick={() => router.push('/providers')}
+          className="text-sm text-primary underline"
+        >
+          Cambiar profesional
+        </button>
+      </motion.div>
+    )}
 
-            {selectedDates.map((date) => {
-              const dateStr = date.toISOString().split('T')[0];
-              const hours = hoursPerDate[dateStr] || [];
-
-              return (
-                <div key={dateStr}>
-                  <h2 className="text-sm font-semibold text-gray-700 mb-2 mt-4">
-                    Horarios para {format(date, 'EEEE dd/MM/yyyy', { locale: es })}
-                  </h2>
-                  <div className="grid grid-cols-3 gap-2">
-                    {hours.length === 0 && <p className="text-gray-500 text-sm">Sin horarios disponibles</p>}
-                    {hours.map((hour) => (
-                      <button
-                        key={hour}
-                        onClick={() => handleHourSelect(dateStr, hour)}
-                        className={`px-3 py-2 rounded-md text-sm border ${
-                          selectedHours[dateStr] === hour
-                            ? 'bg-secondary text-white'
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                        }`}
-                      >
-                        {hour}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-
+    {/* Fechas */}
+    <div>
+      <h2 className="text-sm font-semibold text-gray-700 mb-2">Selecciona fecha</h2>
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {days.map((day) => {
+          const formatted = format(day, 'EEE dd/MM', { locale: es });
+          const isSelected = selectedDates.some((d) => isSameDay(d, day));
+          return (
             <button
-              onClick={handleSubmit}
-              className="w-full mt-4 bg-secondary text-white py-3 rounded-full font-medium hover:bg-primary transition"
+              key={day.toISOString()}
+              onClick={() => toggleDate(day)}
+              className={`min-w-[80px] text-sm px-3 py-2 rounded-lg border ${
+                isSelected
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-50 text-gray-800 hover:bg-gray-100'
+              }`}
             >
-              Confirmar citas
+              {formatted}
             </button>
-          </>
-        )}
+          );
+        })}
       </div>
     </div>
-  );
+
+    {/* Horarios */}
+    {selectedDates.map((date) => {
+      const dateStr = date.toISOString().split('T')[0];
+      const hours = hoursPerDate[dateStr] || [];
+
+      return (
+        <motion.div
+          key={dateStr}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          <h2 className="text-sm font-semibold text-gray-700 mb-2 mt-4">
+            Horarios para {format(date, 'EEEE dd/MM/yyyy', { locale: es })}
+          </h2>
+          <div className="grid grid-cols-4 gap-2">
+            {hours.length === 0 && (
+              <p className="text-gray-500 text-sm">Sin horarios disponibles</p>
+            )}
+            {hours.map((hour) => (
+              <button
+                key={hour}
+                onClick={() => handleHourSelect(dateStr, hour)}
+                className={`px-4 py-2 rounded-lg text-sm border ${
+                  selectedHours[dateStr] === hour
+                    ? 'bg-primary text-white'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+              >
+                {hour}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      );
+    })}
+
+    {/* Resumen */}
+    {selectedDates.length > 0 && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-2 text-sm"
+      >
+        <h3 className="font-semibold text-blue-900">Resumen de tu cita</h3>
+        <p>
+          <strong>Profesional:</strong> {provider?.name}
+        </p>
+        <p>
+          <strong>Fecha:</strong>{' '}
+          {format(selectedDates[0], 'EEEE dd/MM/yyyy', { locale: es })}
+        </p>
+        <p>
+          <strong>Hora:</strong>{' '}
+          {selectedHours[selectedDates[0].toISOString().split('T')[0]]}
+        </p>
+        <p>
+          <strong>Duración:</strong> 60 minutos
+        </p>
+      </motion.div>
+    )}
+
+    {/* Confirmar */}
+    <button
+      onClick={handleSubmit}
+      className="w-full mt-4 bg-primary text-white py-3 rounded-full font-semibold hover:bg-secondary transition"
+    >
+      Confirmar citas
+    </button>
+  </motion.div>
+);
 }
 
 
