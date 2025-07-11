@@ -111,7 +111,7 @@ const Navbar = () => {
                 onClick={() => handleNavigation("/login", "Cargando...")}
                 className="text-secondary px-4 py-2 rounded-full text-sm hover:text-secondary transition"
               >
-                Iniciar sesión
+                Iniciar Sesión
               </button>
               <button
                 onClick={() => handleNavigation("/register/provider", "Cargando...")}
