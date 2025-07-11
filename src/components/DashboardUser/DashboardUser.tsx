@@ -32,7 +32,8 @@ export default function DashboardUser() {
               <UserIcon className="mr-3 h-4 w-4" />
               Mi perfil
             </button>
-            <button className="btn-dashboard">
+            <button className="btn-dashboard"
+            onClick={() => router.push('/dashboard/user/appointments')}>
               <History className="mr-3 h-4 w-4" />
               Historial de turnos
             </button>

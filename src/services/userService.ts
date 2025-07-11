@@ -1,23 +1,8 @@
 import { RegisterUserValues } from "@/types/forms/RegisterUser";
-  
-/** 
+
+
   export const registerUser = async (userData: RegisterUserValues) => {
-    const res = await fetch("http://localhost:4000/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData.user),
-    });
-  
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(errorText || "Error al registrar usuario");
-    }
-  
-    return await res.json();
-  };
-*/
-  export const registerUser = async (userData: RegisterUserValues) => {
-    const res = await fetch("http://localhost:4000/auth/signup", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
@@ -43,7 +28,7 @@ import { RegisterUserValues } from "@/types/forms/RegisterUser";
 
 
   export const getUserById = async (id: string, token: string) => {
-    const res = await fetch(`http://localhost:4000/users/${id}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

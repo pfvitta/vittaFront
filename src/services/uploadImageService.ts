@@ -3,7 +3,7 @@ export const handleImageUpload = async (file: File, userId: string) => {
     formData.append('image', file);
   
     try {
-      const response = await fetch(`http://localhost:4000/files/uploadImage/${userId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/files/uploadImage/${userId}`, {
         method: 'POST',
         body: formData,
       });

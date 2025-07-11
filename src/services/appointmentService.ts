@@ -3,7 +3,7 @@
 import { Appointment } from "@/types/Appointment";
 
 export type AvailableHour = { hourHand: string };
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+//const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
 export interface ValidateAppointmentPayload {
@@ -14,7 +14,7 @@ export interface ValidateAppointmentPayload {
 export interface CreateAppointmentPayload {
   userId: string;
   professionalId: string;
-  date: string; // formato 'YYYY-MM-DD'
+  date: Date; // formato 'YYYY-MM-DD'
   time: string; // '08:00', '09:00', etc.
   status: string; // por ejemplo 'Pendiente' o 'Confirmado'
 }
@@ -27,7 +27,7 @@ export const getAvailableHours = async ({
   professionalId: string;
   date: string;
 }): Promise<AvailableHour[]> => {
-  const response = await fetch(`${API_URL}/appointments/validate`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/validate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ professionalId, date }),
@@ -49,10 +49,10 @@ export const getAvailableHours = async ({
 export async function createAppointment(data: CreateAppointmentPayload) {
   console.log('Payload a enviar a /appointments/create:', data);
 
-  const response = await fetch('http://localhost:4000/appointments/create', {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/create`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify(data), // ✅ Date se serializa automáticamente como ISO 8601
   });
 
   if (!response.ok) {
@@ -66,23 +66,41 @@ export async function createAppointment(data: CreateAppointmentPayload) {
 
 
 
+
 export const getAppointmentsByUser = async (userId: string): Promise<Appointment[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/user/${userId}`);
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/appointments/user/${userId}`;
+  console.log('URL completa que se va a fetch:', url);
+
+  const res = await fetch(url);
+
   if (!res.ok) throw new Error('Error al obtener turnos del usuario');
   return res.json();
 };
 
-export const getAppointmentsByProvider = async (providerId: string): Promise<Appointment[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/provider/${providerId}`);
-  if (!res.ok) throw new Error('Error al obtener turnos del proveedor');
-  return res.json();
+
+export const getAppointmentsByProvider = async (professionalId: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/provider/${professionalId}`);
+  if (!res.ok) throw new Error('Error al obtener turnos del profesional');
+  return await res.json();
 };
 
-export const cancelAppointment = async (id: string) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/${id}/cancel`, {
+
+
+
+export const cancelAppointment = async (appointmentId: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/cancel/${appointmentId}`, {
     method: 'PATCH',
   });
   if (!res.ok) throw new Error('Error al cancelar turno');
   return res.json();
 };
+
+export const confirmAppointment = async (appointmentId: string) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/provider/confirm/${appointmentId}`, {
+    method: 'PATCH',
+  });
+  if (!res.ok) throw new Error('Error al confirmar turno');
+  return await res.json();
+};
+
 

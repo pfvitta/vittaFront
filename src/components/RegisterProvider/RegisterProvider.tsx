@@ -276,7 +276,7 @@ export default function RegisterProviderForm() {
 
         <div className="relative w-full h-[500px] md:h-auto md:flex-1">
           <Image
-            src="/foto-register1.jfif"
+            src="/registerProvider.jpeg"
             alt="Consulta virtual"
             fill
             className="object-cover"
