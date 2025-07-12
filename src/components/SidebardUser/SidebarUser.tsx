@@ -44,7 +44,7 @@ export default function SidebarUser({ children }: SidebarUserProps) {
               <History className="mr-3 h-4 w-4" />
               Historial de turnos
             </button>
-            <button className="btn-dashboard">
+            <button className="btn-dashboard" onClick={() => router.push('/dashboard/user/nutritional-plan')}>
               <Utensils className="mr-3 h-4 w-4" />
               Plan nutricional
             </button>

@@ -7,7 +7,8 @@ import { getProviderById } from '@/services/providerService';
 import { Provider } from '@/types/Provider';
 import { useAuth } from '@/context/AuthContext';
 import { MapPin, User, IdCard } from 'lucide-react';
-import {toast} from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
+import BackButton from '../BackButton/BackButton';
 
 export default function ProviderProfile() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function ProviderProfile() {
   const [provider, setProvider] = useState<Provider | null>(null);
   const [loading, setLoading] = useState(true);
   const [error] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false); // Nuevo estado para el loading
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -39,17 +40,31 @@ export default function ProviderProfile() {
 
   const handleBookingClick = () => {
     setIsProcessing(true);
-    setTimeout(() => {
-      if (!hasMembership) {
+    
+    if (!hasMembership) {
+      toast.error('Para agendar una cita debes suscribirte a la membresía', {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: '#fef2f2',
+          color: '#b91c1c',
+          padding: '16px',
+          fontSize: '1rem',
+          fontWeight: '600'
+        }
+      });
+      
+      setTimeout(() => {
         router.push(`/memberships?redirectTo=/providers/${id}`);
-      } else {
+        setIsProcessing(false);
+      }, 5000);
+    } else {
+      setTimeout(() => {
         router.push(`/providers/${id}/appointments`);
-      }
-      setIsProcessing(false);
-    }, 1000);
+        setIsProcessing(false);
+      }, 1000);
+    }
   };
-
-  
 
   if (loading) return <p className="p-4">Cargando perfil...</p>;
   if (error || !provider) return <p className="p-4 text-red-500">Error: {error}</p>;
@@ -61,10 +76,14 @@ export default function ProviderProfile() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white p-8 rounded-xl shadow-lg flex flex-col items-center">
             <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
-            <p className="mt-4 text-lg font-medium text-gray-700">Procesando...</p>
+            <p className="mt-4 text-lg font-medium text-gray-700">Redirigiendo...</p>
           </div>
         </div>
       )}
+
+      <div className="absolute top-24 left-4 z-10"> {/* Cambié top-4 a top-24 */}
+          <BackButton />
+        </div>
 
       {/* Imagen */}
       <div className="col-span-1 flex justify-center md:justify-start">
@@ -146,7 +165,6 @@ export default function ProviderProfile() {
         <p className="text-sm text-gray-700 mt-1">
           Incluye 2 sesiones al mes para consultas, controles o planes alimenticios.
         </p>
-        
       </div>
     </div>
   );
