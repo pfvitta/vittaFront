@@ -7,6 +7,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
 import {toast} from 'react-hot-toast';
+import BackButton from "../BackButton/BackButton";
 
 
 
@@ -77,6 +78,10 @@ export default function RegisterProviderForm() {
           </div>
         </div>
       )}
+
+      <div className="absolute top-24 left-4 z-10"> {/* Cambié top-4 a top-24 */}
+          <BackButton />
+        </div>
 
       <div className="flex flex-col md:flex-row w-full max-w-5xl shadow-xl rounded-2xl overflow-hidden">
         <div className="bg-white p-8 w-full md:w-auto md:min-w-[400px]">

@@ -73,15 +73,27 @@ export const getAppointmentsByUser = async (userId: string): Promise<Appointment
 
   const res = await fetch(url);
 
+  if (res.status === 404) {
+    // Si el backend devuelve 404 cuando no hay turnos, simplemente devolvemos []
+    return [];
+  }
+
   if (!res.ok) throw new Error('Error al obtener turnos del usuario');
+
   return res.json();
 };
 
-
-export const getAppointmentsByProvider = async (professionalId: string) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/provider/${professionalId}`);
-  if (!res.ok) throw new Error('Error al obtener turnos del profesional');
-  return await res.json();
+export const getAppointmentsByProvider = async (providerId: string): Promise<Appointment[]> => {
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/appointments/provider/${providerId}`;
+  try {
+    const res = await fetch(url);
+    if (res.status === 404) return []; // 👉 si no hay turnos o el provider no existe
+    if (!res.ok) throw new Error('Error al obtener turnos del profesional');
+    return res.json();
+  } catch (error) {
+    console.error('Error en getAppointmentsByProvider:', error);
+    return []; // 👉 devuelve array vacío si hay cualquier otro error controlado
+  }
 };
 
 

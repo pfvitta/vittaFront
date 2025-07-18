@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import { Calendar, Clock, User, ArrowRight, Tag, TrendingUp } from 'lucide-react';
+import Link from 'next/link';
+import BackButton from '../BackButton/BackButton';
 
 export default function VittaBlog() {
   const blogPosts = [
@@ -49,6 +51,9 @@ export default function VittaBlog() {
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
       <section className="bg-gradient-to-br from-teal-50 to-green-50 py-16 text-center">
+        <div className="absolute top-24 left-4 z-10"> {/* Cambié top-4 a top-24 */}
+          <BackButton />
+        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center items-center mb-4">
             <TrendingUp className="w-8 h-8 text-teal-600 mr-3" />
@@ -126,9 +131,12 @@ export default function VittaBlog() {
                       </p>
                     </div>
                   </div>
-                  <button className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg font-medium flex items-center">
+                  <Link target="_blank" href="https://www.revistaalimentaria.es/consumidora/alimentacion-deportiva/tendencias-nutricion-2025-mejores-habitos-alimenticios-entrenamiento">
+                    <button className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg font-medium flex items-center">
                     Leer más <ArrowRight className="w-4 h-4 ml-2" />
                   </button>
+                  </Link>
+                  
                 </div>
               </div>
             </div>

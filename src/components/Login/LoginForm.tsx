@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../../context/AuthContext";
 import {toast} from "react-hot-toast";
+import BackButton from "../BackButton/BackButton";
 
 type LoginFormValues = {
   email: string;
@@ -102,6 +103,10 @@ export default function Login() {
           </div>
         </div>
       )}
+
+      <div className="absolute top-24 left-4 z-10"> {/* Cambié top-4 a top-24 */}
+          <BackButton />
+        </div>
 
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
         <div className="flex justify-center mb-8">
